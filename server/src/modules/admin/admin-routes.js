@@ -71,22 +71,6 @@ function registerAdminRoutes(app, service, requireAdmin, options = {}) {
         }
     });
 
-    app.get('/api/admin/trovepal-config', requireAdmin, async (req, res) => {
-        try { res.json({ success: true, data: await service.getTrovePalConfig() }); }
-        catch (error) {
-            logger.error('Failed to get TrovePal configuration:', error);
-            sendError(res, error, 'Failed to get TrovePal configuration');
-        }
-    });
-
-    app.put('/api/admin/trovepal-config', requireAdmin, async (req, res) => {
-        try { res.json({ success: true, data: await service.updateTrovePalConfig(req.body) }); }
-        catch (error) {
-            logger.error('Failed to save TrovePal configuration:', error);
-            sendError(res, error, 'Failed to save TrovePal configuration', 400);
-        }
-    });
-
     app.get('/api/admin/summary', requireAdmin, async (req, res) => {
         try { res.json(await service.getSummary()); }
         catch (error) {

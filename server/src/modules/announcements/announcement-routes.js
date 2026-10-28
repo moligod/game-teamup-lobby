@@ -48,7 +48,7 @@ function registerAnnouncementRoutes(app, service, options = {}) {
         try {
             return res.json({ success: true, data: await service.getChannels() });
         } catch (error) {
-            logger.error('Failed to get TrovePal announcement channels:', error);
+            logger.error('Failed to get announcement channels:', error);
             return res.status(error.statusCode || 502).json({ error: error.message || 'Failed to get announcement channels' });
         }
     });
@@ -62,7 +62,7 @@ function registerAnnouncementRoutes(app, service, options = {}) {
             });
             return res.json({ success: true, data });
         } catch (error) {
-            logger.error('Failed to get TrovePal announcements:', error);
+            logger.error('Failed to get announcements:', error);
             return res.status(error.statusCode || 500).json({ error: error.message || 'Failed to get announcements' });
         }
     });
@@ -82,14 +82,7 @@ function registerAnnouncementRoutes(app, service, options = {}) {
         app.delete('/api/admin/announcements/:id', requireAdmin, handle((req) => manual.remove(req.params.id)));
     }
 
-    app.post('/api/admin/announcements/initialize', requireAdmin, async (_req, res) => {
-        try {
-            return res.json({ success: true, data: await service.initialize() });
-        } catch (error) {
-            logger.error('Failed to initialize TrovePal announcements:', error);
-            return res.status(error.statusCode || 502).json({ error: error.message || 'Failed to initialize announcements' });
-        }
-    });
+
 }
 
 module.exports = { parseChannelName, parsePage, parsePageSize, registerAnnouncementRoutes };

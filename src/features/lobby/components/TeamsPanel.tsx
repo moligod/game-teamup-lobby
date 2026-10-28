@@ -425,7 +425,7 @@ function TeamMembers({
 
   async function inviteMember(playerName: string) {
     try {
-      await copyText(`/joinme ${playerName}`)
+      await copyText(playerName)
       onInviteCopied()
     } catch {
       onError(t('team_react.copyInviteFailed', undefined, '\u590d\u5236\u9080\u8bf7\u6307\u4ee4\u5931\u8d25'))
@@ -445,9 +445,6 @@ function TeamMembers({
               <small>{member.player_name ?? t('team_react.noGameNameBinding', undefined, '\u672a\u7ed1\u5b9a\u6e38\u620f\u540d')}</small>
             </div>
             <div className="row-actions team-member-actions">
-              <Button disabled={!member.player_name} icon={<Eye size={15} />} size="sm" title={t('common.viewDetails', undefined, '\u67e5\u770b\u8be6\u60c5')} onClick={() => member.player_name && void openPlayerProfile(member.player_name)}>
-                {t('common.viewDetails', undefined, '\u67e5\u770b\u8be6\u60c5')}
-              </Button>
               <Button disabled={!member.player_name} icon={<Copy size={15} />} size="sm" title={t('team_react.inviteMember', undefined, '\u9080\u8bf7\u6307\u4ee4')} onClick={() => member.player_name && void inviteMember(member.player_name)}>
                 {t('team_react.inviteMember', undefined, '\u9080\u8bf7\u6307\u4ee4')}
               </Button>

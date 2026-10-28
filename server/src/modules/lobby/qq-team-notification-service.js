@@ -329,15 +329,24 @@ function buildConfiguredActiveTeamListMessages(teams, contentConfig) {
     return renderConfiguredResponse('team_list', buildActiveTeamListMessages(teams), contentConfig);
 }
 
-function buildConfiguredPlayerProfileMessages(profile, contentConfig, view) {
-    return renderConfiguredResponse('player_info', buildPlayerProfileMessages(profile, view), contentConfig);
+function buildConfiguredPlayerProfileMessages(profile, contentConfig) {
+    const name = markdownText(profile?.player?.display_name, '玩家', PLAYER_NAME_MAX_LENGTH);
+    const items = Array.isArray(profile?.items) ? profile.items : [];
+    const lines = items.map(item => {
+        const board = markdownText(displayLeaderboardName(item), '排行榜', 100);
+        const score = markdownText(formatProfileScore(item?.score), '-', 40);
+        const rank = Number.isFinite(Number(item?.rank)) ? ` · 排名 ${Number(item.rank)}` : '';
+        return `- ${board}：${score}${rank}`;
+    });
+    const chunks = splitLines(lines.length ? lines : ['暂无排行榜数据'], PLAYER_PROFILE_CHUNK_LENGTH);
+    return renderConfiguredResponse('player_info', chunks.map(chunk => `## Game Hub 玩家信息\n玩家：${name}\n${chunk}`), contentConfig);
 }
 
 function configuredPlayerInfoUsageMessage(contentConfig) {
     const command = resolveQqBotContentConfig(contentConfig).commands.player_info;
     return renderConfiguredCard('player_info', contentConfig, {
         title: '## Game Hub \u73a9\u5bb6\u4fe1\u606f',
-        body: '\u8bf7\u5728\u6307\u4ee4\u540e\u8f93\u5165\u73a9\u5bb6\u540d\uff0c\u4f8b\u5982\uff1a`/' + markdownText(command) + ' moligod`'
+        body: '\u8bf7\u5728\u6307\u4ee4\u540e\u8f93\u5165\u73a9\u5bb6\u540d\uff0c\u4f8b\u5982\uff1a`/' + markdownText(command) + ' PlayerName`'
     });
 }
 
@@ -392,7 +401,7 @@ const LATEST_NEWS_LIMIT = 5;
 const MARKET_LISTINGS_LIMIT = 5;
 const MARKET_CATEGORY_ORDER = Object.freeze(['flux', 'items', 'boosting', 'accounts', 'codes']);
 const MARKET_CATEGORY_LABELS = new Map([
-    ['flux', '\u539f\u6676 Flux'],
+    ['flux', '游戏货币'],
     ['items', '\u9053\u5177'],
     ['boosting', '\u4ee3\u809d'],
     ['accounts', '\u8d26\u53f7'],
@@ -1067,15 +1076,9 @@ class QqTeamNotificationService {
                 this.playerProfile(playerName),
                 this.getLeaderboardVersion()
             ]);
-            const messages = buildConfiguredPlayerProfileMessages(profile, this.contentConfig, view);
-            const totalPages = Math.max(1, messages.length);
-            const currentPage = Math.min(page, totalPages);
-            const profileName = cleanText(profile?.player?.display_name, playerName);
-            return this.sendReplyMessages(
-                target,
-                [appendMarkdownFooter(messages[currentPage - 1], leaderboardUpdateFooter(leaderboardVersion))],
-                configuredPlayerProfileKeyboard(this.contentConfig, profileName, view, currentPage, totalPages)
-            );
+            const messages = buildConfiguredPlayerProfileMessages(profile, this.contentConfig)
+                .map(message => appendMarkdownFooter(message, leaderboardUpdateFooter(leaderboardVersion)));
+            return this.sendReplyMessages(target, messages, configuredCommandMenuKeyboard(this.contentConfig));
         } catch (error) {
             if (error?.statusCode === 404) {
                 return this.sendReplyMessages(target, [configuredPlayerInfoNotFoundMessage(playerName, this.contentConfig)]);

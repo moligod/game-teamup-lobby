@@ -99,16 +99,6 @@ function createAdminService({ repository, presence, onQqBotConfigUpdated, onQqBo
             });
         },
 
-        getTrovePalConfig() { return repository.getTrovePalPublicConfig(); },
-
-        updateTrovePalConfig(body) {
-            return repository.updateTrovePalConfig({
-                app_name: requiredString(body.app_name, 'app_name', 120),
-                api_key: optionalString(body.api_key, 'api_key', 255),
-                clear_api_key: body.clear_api_key === true
-            });
-        },
-
         async getSummary() {
             return { ...await repository.getSummary(), online_users: presence.getOnlineUserCount() };
         },

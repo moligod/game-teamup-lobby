@@ -8,14 +8,14 @@ function AboutPage() {
     ? [
         ['Find a team', 'Browse the lobby, create a team, set requirements, and manage applications.'],
         ['Stay connected', 'Find friends, send private messages, and chat in the lobby or with your team.'],
-        ['Explore leaderboards', 'Search player and leaderboard data supplied by a separate Trove collector.'],
+        ['Explore leaderboards', 'Browse available player and leaderboard data.'],
         ['Browse the market', 'Publish listings, contact sellers, leave reviews, and report dishonest activity.'],
         ['Read game news', 'Read announcements published by the site administrator.'],
       ]
     : [
         ['寻找队伍', '浏览组队大厅、创建队伍、设置加入条件，并管理入队申请。'],
         ['保持联系', '搜索和添加好友、发送私信，也可以在大厅或队伍中聊天。'],
-        ['查看排行榜', '搜索玩家与排行榜数据；Trove 数据由独立的采集器提供。'],
+        ['查看排行榜', '浏览可用的玩家和排行榜数据。'],
         ['浏览交易市场', '发布商品、联系卖家、留下评价，并提交失信举报。'],
         ['查看游戏资讯', '浏览站点管理员发布的公告与资讯。'],
       ]
@@ -31,8 +31,8 @@ function AboutPage() {
       <div className="panel doc-panel">
         <h2>{en ? 'About Game Hub' : '关于 Game Hub'}</h2>
         <p>{en
-          ? 'Game Hub is a game lobby for finding teammates and keeping useful player tools in one place. The current version is tailored to Trove; supporting another game requires additional adaptation.'
-          : 'Game Hub 是一个帮助玩家寻找队友的游戏大厅，把组队、聊天和常用玩家工具放在一起。当前版本主要适配 Trove；支持其他游戏需要进一步开发和适配。'}</p>
+          ? 'Game Hub is a game lobby for finding teammates and keeping useful player tools in one place. Each deployment can be configured for its own game.'
+          : 'Game Hub 是一个帮助玩家寻找队友的游戏大厅，把组队、聊天和常用玩家工具放在一起。每个部署可以按自己的游戏进行配置。'}</p>
         <h2>{en ? 'What you can do' : '你可以做什么'}</h2>
         {features.map(([title, description]) => (
           <div key={title}>

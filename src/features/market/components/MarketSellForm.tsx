@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Check, Info, LogIn, Pencil, Plus, Power, X } from 'lucide-react'
 import { marketCategories } from '../data/market-catalog'
 import type { MarketCategoryId } from '../types'
-import { getLeaderboardPlayerProfile } from '@/features/leaderboard/api/leaderboard-api'
 import { formatDate, getErrorMessage } from '@/lib/format'
 import type { MarketListing, MarketListingInput, User } from '@/lib/types'
 import { Badge } from '@/shared/ui/Badge'
@@ -20,7 +19,6 @@ interface ListingFormValues {
   playerName: string
 }
 
-type AccountGameNameStatus = 'idle' | 'checking' | 'valid' | 'invalid'
 
 const emptyValues: ListingFormValues = {
   title: '',
@@ -63,7 +61,7 @@ function inputFromListing(listing: MarketListing, isActive = Boolean(listing.is_
 function formatListingPrice(listing: MarketListing) {
   const price = String(Number(listing.price))
   const priceWithCurrency = `${price} CNY`
-  if (listing.category === 'flux') return `${priceWithCurrency} /1M`
+  if (listing.category === 'flux') return `${priceWithCurrency}${listing.price_unit === 'per_million' ? ' / 1M' : ''}`
   return listing.category === 'items' ? `${priceWithCurrency} / ${itemPriceUnit(listing.price_unit)}` : priceWithCurrency
 }
 
@@ -97,77 +95,25 @@ export function MarketSellForm({
   const [message, setMessage] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<number | null>(null)
-  const [accountGameNameStatus, setAccountGameNameStatus] = useState<AccountGameNameStatus>('idle')
-  const [accountGameNameError, setAccountGameNameError] = useState<string | null>(null)
-  const accountGameNameRequestId = useRef(0)
 
   function setValue<Key extends keyof ListingFormValues>(key: Key, value: ListingFormValues[Key]) {
     setValues((current) => ({ ...current, [key]: value }))
   }
 
-  const validateAccountGameName = useCallback(async (rawPlayerName: string) => {
-    const playerName = rawPlayerName.trim()
-    const requestId = accountGameNameRequestId.current + 1
-    accountGameNameRequestId.current = requestId
-    if (!playerName) {
-      setAccountGameNameStatus('invalid')
-      setAccountGameNameError('请输入游戏名')
-      return false
-    }
-
-    setAccountGameNameStatus('checking')
-    setAccountGameNameError(null)
-    try {
-      await getLeaderboardPlayerProfile(playerName)
-      if (accountGameNameRequestId.current === requestId) setAccountGameNameStatus('valid')
-      return true
-    } catch (err) {
-      if (accountGameNameRequestId.current === requestId) {
-        const errorMessage = getErrorMessage(err)
-        setAccountGameNameStatus('invalid')
-        setAccountGameNameError(errorMessage.trim().toLowerCase() === 'player not found'
-          ? '没有查询到该游戏名数据，请输入正确的游戏名'
-          : errorMessage)
-      }
-      return false
-    }
-  }, [])
-
-  useEffect(() => {
-    accountGameNameRequestId.current += 1
-    if (category !== 'accounts') {
-      setAccountGameNameStatus('idle')
-      setAccountGameNameError(null)
-      return
-    }
-    if (!values.playerName.trim()) {
-      setAccountGameNameStatus('idle')
-      setAccountGameNameError(null)
-      return
-    }
-
-    const timer = window.setTimeout(() => void validateAccountGameName(values.playerName), 450)
-    return () => window.clearTimeout(timer)
-  }, [category, validateAccountGameName, values.playerName])
+  const validateAccountGameName = async (value: string) => Boolean(value.trim())
 
   function resetEditor() {
-    accountGameNameRequestId.current += 1
     setEditing(null)
     setValues({ ...emptyValues })
-    setAccountGameNameStatus('idle')
-    setAccountGameNameError(null)
     setActionError(null)
   }
 
   function editListing(listing: MarketListing) {
-    accountGameNameRequestId.current += 1
     onCategoryChange(listing.category)
     setEditing(listing)
     setValues(valuesFromListing(listing))
     setMessage(null)
     setActionError(null)
-    setAccountGameNameStatus(listing.category === 'accounts' && listing.player_name ? 'valid' : 'idle')
-    setAccountGameNameError(null)
   }
 
   async function submitListing(event: FormEvent<HTMLFormElement>) {
@@ -183,7 +129,7 @@ export function MarketSellForm({
         title: values.title,
         description: values.description,
         price: Number(values.price),
-        price_unit: category === 'flux' ? 'per_million' : category === 'items' ? values.priceUnit : editing?.price_unit ?? 'each',
+        price_unit: category === 'items' ? values.priceUnit : editing?.price_unit ?? 'each',
         stock: category === 'accounts' ? '' : values.stock,
         player_name: category === 'accounts' ? values.playerName.trim() : '',
         delivery_method: editing?.delivery_method ?? '',
@@ -245,9 +191,9 @@ export function MarketSellForm({
           {error || actionError ? <Notice variant="error">{actionError || error}</Notice> : null}
           <div className="market-form-section"><div className="market-form-heading"><span>01</span><div><h2>{t('market.chooseCategory')}</h2><p>{t('market.chooseCategoryHint')}</p></div></div><div className="market-category-picker">{marketCategories.map((item) => <button aria-pressed={category === item.id} className={category === item.id ? 'active' : ''} key={item.id} onClick={() => onCategoryChange(item.id)} type="button">{t(item.labelKey)}</button>)}</div></div>
           <div className="market-form-section"><div className="market-form-heading"><span>02</span><div><h2>{t('market.listingDetails')}</h2><p>{t('market.listingDetailsHint')}</p></div></div><div className="market-form-grid">
-            <label className="market-form-wide">{t('market.listingTitle')}<input maxLength={120} onChange={(event) => setValue('title', event.target.value)} required value={values.title} placeholder={t('marketC2C.listingTitlePlaceholder', undefined, '例如：美服 Flux 现货，5 分钟内交付')} /></label>
-            <label>{category === 'flux' ? `${t('marketC2C.unitPrice', undefined, '单价')} (CNY /1M)` : t('marketC2C.unitPrice', undefined, '单价')}{category === 'items' ? <div className="market-input-suffix"><input inputMode="decimal" min="0" onChange={(event) => setValue('price', event.target.value)} required step="0.01" type="number" value={values.price} placeholder="0.00" /><select aria-label={t('marketSeller.priceUnit', undefined, '计价单位')} onChange={(event) => setValue('priceUnit', event.target.value)} value={values.priceUnit}><option value="个">个</option><option value="千">千</option><option value="万">万</option></select></div> : <input inputMode="decimal" min="0" onChange={(event) => setValue('price', event.target.value)} required step="0.01" type="number" value={values.price} placeholder="0.00" />}</label>
-            {category !== 'accounts' ? <label>{category === 'boosting' ? t('market.availableTime') : t('marketC2C.remainingStockLabel', undefined, '剩余库存')}{category === 'flux' ? <div className="market-input-suffix"><input maxLength={100} onChange={(event) => setValue('stock', event.target.value)} required value={values.stock} /><span>{t('marketC2C.million', undefined, '百万')}</span></div> : category === 'items' ? <input inputMode="numeric" maxLength={100} onChange={(event) => setValue('stock', event.target.value.replace(/\D/g, ''))} pattern="[0-9]*" required type="text" value={values.stock} /> : <input maxLength={100} onChange={(event) => setValue('stock', event.target.value)} required value={values.stock} placeholder={category === 'boosting' ? t('market.availableTimePlaceholder') : t('market.stockPlaceholder')} />}</label> : <label>{t('team_react.playerName', undefined, '游戏名')}<input maxLength={128} onChange={(event) => setValue('playerName', event.target.value)} required value={values.playerName} placeholder={t('team_react.playerNamePlaceholder', undefined, '请输入游戏名')} />{accountGameNameStatus === 'checking' ? <small className="market-game-name-status checking">{t('common.loading')}</small> : null}{accountGameNameStatus === 'valid' ? <small className="market-game-name-status valid">已查询到该游戏名</small> : null}{accountGameNameStatus === 'invalid' && accountGameNameError ? <small className="market-game-name-status invalid">{accountGameNameError}</small> : null}</label>}
+            <label className="market-form-wide">{t('market.listingTitle')}<input maxLength={120} onChange={(event) => setValue('title', event.target.value)} required value={values.title} placeholder={t('marketC2C.listingTitlePlaceholder', undefined, '请输入商品标题')} /></label>
+            <label>{t('marketC2C.unitPrice', undefined, '单价')}{category === 'items' ? <div className="market-input-suffix"><input inputMode="decimal" min="0" onChange={(event) => setValue('price', event.target.value)} required step="0.01" type="number" value={values.price} placeholder="0.00" /><select aria-label={t('marketSeller.priceUnit', undefined, '计价单位')} onChange={(event) => setValue('priceUnit', event.target.value)} value={values.priceUnit}><option value="个">个</option><option value="千">千</option><option value="万">万</option></select></div> : <input inputMode="decimal" min="0" onChange={(event) => setValue('price', event.target.value)} required step="0.01" type="number" value={values.price} placeholder="0.00" />}</label>
+            {category !== 'accounts' ? <label>{category === 'boosting' ? t('market.availableTime') : t('marketC2C.remainingStockLabel', undefined, '剩余库存')}{category === 'flux' ? <input maxLength={100} onChange={(event) => setValue('stock', event.target.value)} required value={values.stock} /> : category === 'items' ? <input inputMode="numeric" maxLength={100} onChange={(event) => setValue('stock', event.target.value.replace(/\D/g, ''))} pattern="[0-9]*" required type="text" value={values.stock} /> : <input maxLength={100} onChange={(event) => setValue('stock', event.target.value)} required value={values.stock} placeholder={category === 'boosting' ? t('market.availableTimePlaceholder') : t('market.stockPlaceholder')} />}</label> : <label>{t('team_react.playerName', undefined, '游戏名')}<input maxLength={128} onChange={(event) => setValue('playerName', event.target.value)} required value={values.playerName} placeholder={t('team_react.playerNamePlaceholder', undefined, '请输入游戏名')} /></label>}
             <label className="market-form-wide">{t('marketSeller.description')}<textarea maxLength={1000} onChange={(event) => setValue('description', event.target.value)} placeholder={t('marketSeller.descriptionPlaceholder')} rows={3} value={values.description} /></label>
           </div></div>
           <Notice variant="info" className="market-publish-note"><Info size={16} /> {t('marketSeller.publishRule')}</Notice>
@@ -263,7 +209,7 @@ export function MarketSellForm({
         <div className="market-my-listings-rows">
           {listings.map((listing) => (
             <article className="market-my-listing" key={listing.id}>
-              <div><strong>{listing.title}</strong><span>{t(`market.categories.${listing.category}`)} / {formatListingPrice(listing)}</span><small>{listing.category !== 'accounts' ? <>{listing.category === 'flux' ? t('marketC2C.fluxStock', { stock: listing.stock }, `库存 ${listing.stock} 百万`) : t('marketC2C.remainingStock', { stock: listing.stock }, `剩余库存 ${listing.stock}`)} / </> : null}{formatDate(listing.updated_at || listing.created_at)}</small></div>
+              <div><strong>{listing.title}</strong><span>{t(`market.categories.${listing.category}`)} / {formatListingPrice(listing)}</span><small>{listing.category !== 'accounts' ? <>{listing.category === 'flux' ? t('marketC2C.remainingStock', { stock: listing.stock }, `剩余库存 ${listing.stock}`) : t('marketC2C.remainingStock', { stock: listing.stock }, `剩余库存 ${listing.stock}`)} / </> : null}{formatDate(listing.updated_at || listing.created_at)}</small></div>
               <Badge tone={listing.is_active ? 'success' : 'neutral'}>{listing.is_active ? t('marketSeller.listed') : t('marketSeller.draft')}</Badge>
               <div className="market-my-listing-actions"><IconButton label={t('marketSeller.edit')} onClick={() => editListing(listing)}><Pencil size={15} /></IconButton><IconButton disabled={togglingId === listing.id} label={listing.is_active ? t('marketSeller.unlist') : t('marketSeller.list')} onClick={() => void toggleListing(listing)}><Power size={15} /></IconButton></div>
             </article>

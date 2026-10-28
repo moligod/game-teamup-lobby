@@ -2,7 +2,7 @@
 
 [中文](README.md) | [中文](README.md)
 
-Game Hub (formerly TroveBBS) is a game team-finding lobby currently tailored to Trove. React, TypeScript and Vite frontend; Node.js, Express and PostgreSQL backend. Features include a team lobby, leaderboard, marketplace, profiles, social features and administration. Leaderboard collection is supplied by the separately distributed Trove leaderboard collector.
+Game Hub (formerly TroveBBS) is a team-finding lobby configurable for a single game. React, TypeScript and Vite frontend; Node.js, Express and PostgreSQL backend. Features include a team lobby, leaderboard, marketplace, profiles, social features and administration. Leaderboard data requires a compatible external collector.
 
 [中文](README.md)
 
@@ -10,17 +10,17 @@ Game Hub (formerly TroveBBS) is a game team-finding lobby currently tailored to 
 
 - **Team lobby:** browse and create teams, set requirements, manage applications, and use lobby or team chat.
 - **Friends and messages:** search users, manage requests, exchange direct messages, and see online presence. QQ OAuth must be configured for sign-in.
-- **Leaderboards and profiles:** search rankings and bind a game character. Trove data is supplied by a separate MOD and collector; the website does not collect it automatically.
+- **Leaderboards and profiles:** search rankings and bind a game character. Data must be uploaded by a compatible collector; the website does not collect it automatically.
 - **Marketplace:** browse or publish listings, contact sellers, and read or submit reviews.
 - **Dishonesty reports:** submit evidence and reports for administrator review.
-- **News and QQ bot:** administrators publish announcements manually; TrovePal import and QQ bot notifications are optional.
+- **News and QQ bot:** administrators publish announcements manually; QQ bot notifications are optional.
 - **Administration:** manage users, teams, marketplace items, reports and integrations.
 
-The current game-specific data and features target Trove. Supporting other games requires development. The site does not currently provide a forum or post feed.
+Each deployment serves one configured game; leaderboard collection requires a game-specific integration. The site does not currently provide a forum or post feed.
 
 ## Screenshots
 
-These images were captured in an isolated local demo with an empty database. Available data and features depend on your configuration. The interface supports Chinese, English, and light/dark themes.
+These images were captured in an isolated local demo with sample data. Available data and features depend on your configuration. The interface supports Chinese, English, and light/dark themes.
 
 ### Team lobby
 
@@ -30,7 +30,7 @@ Browse teams and chat; sign in to create or join a team.
 
 ### Leaderboards
 
-Browse and search rankings; the demo is empty until data is imported.
+Browse and search rankings; the page is empty until data is imported.
 
 ![Leaderboards](docs/screenshots/leaderboard-en.png)
 
@@ -42,7 +42,7 @@ Browse categories and sign in to publish or contact a seller.
 
 ### News
 
-Administrators can publish announcements directly; TrovePal import is optional.
+Administrators can publish announcements directly.
 
 ![News](docs/screenshots/news-en.png)
 
@@ -73,9 +73,9 @@ Manage manually published announcements:
 ## Typical setup
 
 1. Start the site using Docker below and set a unique administrator account and password.
-2. Sign in at `/admin` and configure your own QQ OAuth. Configure TrovePal, an image host or QQ bot if needed.
+2. Sign in at `/admin` and configure your own QQ OAuth. Configure an image host or QQ bot if needed.
 3. Users can then sign in with QQ to create or apply to teams, manage friends, chat and use marketplace features.
-4. For Trove leaderboards, use the separately distributed collector and follow its instructions to enter this site's endpoint and matching token.
+4. For leaderboards, use a collector compatible with the target game and upload API.
 
 ## Run with Docker
 
@@ -104,7 +104,6 @@ Copy `.env.example` to `.env` and edit the latter. The file is Git-ignored. Repl
 | `LEADERBOARD_COLLECTOR_TOKEN` | At least 32 random characters; enter the same value in the collector upload window. Empty disables collector endpoints. |
 | `PUBLIC_BASE_URL`, `FRONTEND_BASE_URL` | Your public deployment URLs; replace examples. |
 | `QQ_OAUTH_API_URL`, `QQ_OAUTH_APPID`, `QQ_OAUTH_APPKEY`, `QQ_OAUTH_CALLBACK_URL` | Your compatible QQ OAuth service URL, credentials and registered callback, e.g. `https://your-domain.example/api/auth/qq/callback`. The sample provider address is a placeholder. |
-| `TROVEPAL_API_KEY`, `TROVEPAL_APP_NAME` | Optional TrovePal announcements key and bound application name. |
 | `IMAGE_HOST_BASE_URL`, `IMAGE_HOST_API_KEY`, `IMAGE_HOST_REVIEW_FOLDER_ID` | Optional image host settings; the administration UI can also set these. The production Compose file currently requires configuration through the admin UI. |
 | `QQ_BOT_APP_ID`, `QQ_BOT_APP_SECRET`, `QQ_BOT_TEAM_URL` | Optional QQ bot credentials and lobby URL. Subsequent admin UI settings take precedence. |
 | `VITE_API_BASE_URL`, `VITE_WS_BASE_URL` | Optional build-time API/WebSocket origins. Same-origin proxy deployments normally leave these empty. Do not put secrets here. |
@@ -130,4 +129,10 @@ docker compose -f docker-compose.prod.yml config --quiet
 
 Public endpoints are `/api`, `/health`, `/uploads` and WebSocket `/ws`. For a public deployment, configure HTTPS and a reverse proxy that forwards these paths and WebSocket connections. Production Compose binds to local port 8080 by default. Replace `example.com` in `index.html`, `public/robots.txt` and `public/sitemap.xml` with your own domain. See [architecture](ARCHITECTURE.md) and [developer notes](docs/ai/). The original automated deployment workflow is not included in this cleaned copy.
 
-Administrators can publish, edit and delete manual announcements under `/admin` → Announcements. Automatic TrovePal sync is off by default. To enable it, set `TROVEPAL_ENABLED=true`, configure its key and app name in `.env`, and recreate the backend container. Existing TrovePal announcements are retained.
+Administrators can publish, edit and delete manual announcements under `/admin` → Announcements. Previously imported announcements are retained; TrovePal synchronization is no longer supported.
+
+## Single-game configuration
+
+- Set `VITE_GAME_NAME` in `.env` to display your game name in the header. Rebuild the frontend with `docker compose up -d --build frontend` after changing it.
+- Optionally set `GAME_TEAM_TYPES` to a JSON array, for example `GAME_TEAM_TYPES=[{"id":"raid","zh":"副本","en":"Raid"}]`. Each item needs a unique id and Chinese and English labels. Recreate the backend after changes. Configured types are inserted or their translated labels updated. Other existing types and teams remain in the database but are excluded from the new-team selector.
+- The leaderboard keeps its snapshot upload API; a collector for another game must be implemented separately. Existing leaderboard data is retained.

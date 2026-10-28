@@ -1,3 +1,4 @@
+import { GAME_NAME } from './config/constants'
 import { lazy, Suspense, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { BarChart3, Compass, Home, LogIn, LogOut, Newspaper, ShieldAlert, ShoppingBag, UsersRound } from 'lucide-react'
@@ -32,23 +33,23 @@ const DishonestyPage = lazy(loadDishonestyPage)
 const SEO_PAGES: Record<string, { canonicalPath: string; title: string; description: string }> = {
   '/': {
     canonicalPath: '/',
-    title: 'Game Hub | 宝藏世界组队、聊天与交易大厅',
-    description: 'Game Hub 是宝藏世界玩家大厅，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
+    title: GAME_NAME ? `${GAME_NAME} | Game Hub` : 'Game Hub | 游戏组队大厅',
+    description: 'Game Hub 提供组队、聊天与玩家交易。',
   },
   '/lobby': {
     canonicalPath: '/',
-    title: 'Game Hub | 宝藏世界组队、聊天与交易大厅',
-    description: 'Game Hub 是宝藏世界玩家大厅，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
+    title: GAME_NAME ? `${GAME_NAME} | Game Hub` : 'Game Hub | 游戏组队大厅',
+    description: 'Game Hub 提供组队、聊天与玩家交易。',
   },
   '/leaderboard': {
     canonicalPath: '/leaderboard',
-    title: 'Trove 排行榜 | 宝藏世界玩家数据 | Game Hub',
-    description: '查看宝藏世界玩家排行榜、职业与战力数据，发现适合一起组队开车的伙伴。',
+    title: '排行榜 | Game Hub',
+    description: '查看玩家排行榜。',
   },
   '/market': {
     canonicalPath: '/market',
-    title: 'Trove 商品交易 | Flux、原晶、彩币与代练 | Game Hub',
-    description: '浏览宝藏世界商品交易信息，包括 Flux、原晶、彩币、Create、代肝、代练与宝石箱。',
+    title: '交易市场 | Game Hub',
+    description: '浏览玩家发布的交易信息。',
   },
   '/news': {
     canonicalPath: '/news',
@@ -57,13 +58,13 @@ const SEO_PAGES: Record<string, { canonicalPath: string; title: string; descript
   },
   '/dishonesty': {
     canonicalPath: '/dishonesty',
-    title: 'Trove 交易黑名单 | 宝藏世界交易查询 | Game Hub',
-    description: '查询已审核的宝藏世界交易失信记录，提交可核验的交易证据，帮助社区安全购买商品。',
+    title: '失信名单 | Game Hub',
+    description: '查询已审核的交易失信记录。',
   },
   '/about': {
     canonicalPath: '/about',
-    title: '关于 Game Hub | 宝藏世界玩家大厅',
-    description: '了解 Game Hub 如何服务宝藏世界玩家的组队、开车、资讯与商品交易需求。',
+    title: '关于 Game Hub',
+    description: '了解 Game Hub 的组队、聊天、资讯与交易功能。',
   },
 }
 
@@ -185,7 +186,7 @@ function App() {
             <span className="brand-mark"><Compass size={19} strokeWidth={2.2} /></span>
             <span>
               <strong>Game Hub</strong>
-              <small>{t('app.brandSubtitle')}</small>
+              <small>{GAME_NAME || t('app.brandSubtitle')}</small>
             </span>
           </Link>
           <nav className="nav-links" aria-label={t('nav.home')}>
@@ -229,9 +230,6 @@ function App() {
           {routes}
         </main>
         <footer className="site-footer">
-          <a href="https://trovepal.com/" target="_blank" rel="noreferrer">
-            {'TrovePal'}
-          </a>
         </footer>
       </div>
       )}

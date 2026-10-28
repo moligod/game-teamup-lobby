@@ -7,9 +7,6 @@ const {
 const {
     createUploadBulkhead
 } = require('../src/infrastructure/uploads/image-host-upload');
-const {
-    TrovePalAnnouncementClient
-} = require('../src/infrastructure/trovepal/trovepal-announcement-client');
 
 function imageHostConfig() {
     return {
@@ -147,23 +144,4 @@ test('upload bulkhead rejects excess work and releases capacity on every exit pa
     assert.equal(bulkhead.activeCount(), 1);
     finalResponse.emit('close');
     assert.equal(bulkhead.activeCount(), 0);
-});
-
-test('TrovePal requests convert dependency deadlines to a gateway timeout', async () => {
-    let requestSignal = null;
-    const client = new TrovePalAnnouncementClient({
-        apiKey: 'trovepal_sk_test',
-        timeoutMs: 10,
-        fetch: async (_url, options) => {
-            requestSignal = options.signal;
-            return new Promise(() => undefined);
-        }
-    });
-
-    await assert.rejects(
-        () => client.listChannels(),
-        (error) => error.statusCode === 504
-            && error.message === 'TrovePal announcement request timed out after 10ms'
-    );
-    assert.equal(requestSignal.aborted, true);
 });

@@ -1,3 +1,4 @@
+const { configuredTeamTypes } = require('../../../platform/game-config');
 const { PROFESSION_COLUMNS } = require('./postgres-client');
 
 class PostgresLobbyRepository {
@@ -11,7 +12,7 @@ class PostgresLobbyRepository {
     withTransaction(callback) { return this.database.withTransaction(callback); }
 
     getTeamTypes() {
-        return this.query('SELECT * FROM team_types ORDER BY id');
+        return this.query('SELECT * FROM team_types WHERE id = ANY($1::text[]) ORDER BY id', [configuredTeamTypes().map(type => type.id)]);
     }
 
     getTeamTypesI18n(language = 'zh') {
@@ -22,8 +23,9 @@ class PostgresLobbyRepository {
              LEFT JOIN team_types_i18n i18n
                 ON i18n.team_type_id = tt.id
                 AND i18n.language = $1
+             WHERE tt.id = ANY($2::text[])
              ORDER BY tt.id`,
-            [normalizedLanguage]
+            [normalizedLanguage, configuredTeamTypes().map(type => type.id)]
         );
     }
 

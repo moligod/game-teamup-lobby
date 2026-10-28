@@ -29,6 +29,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
+      GAME_TEAM_TYPES: ${GAME_TEAM_TYPES:-}
       NODE_ENV: production
       PORT: 3000
       POSTGRES_HOST: postgres
@@ -41,11 +42,6 @@ services:
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
-      TROVEPAL_ENABLED: ${TROVEPAL_ENABLED:-false}
-      TROVEPAL_API_KEY: ${TROVEPAL_API_KEY:-}
-      TROVEPAL_APP_NAME: ${TROVEPAL_APP_NAME:-TroveBBS}
-      TROVEPAL_REQUEST_TIMEOUT_MS: ${TROVEPAL_REQUEST_TIMEOUT_MS:-10000}
-      TROVEPAL_ANNOUNCEMENT_REFRESH_MS: ${TROVEPAL_ANNOUNCEMENT_REFRESH_MS:-900000}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
       FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-}
       QQ_OAUTH_API_URL: ${QQ_OAUTH_API_URL:-}
@@ -92,6 +88,7 @@ services:
       dockerfile: Dockerfile
       args:
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        VITE_GAME_NAME: ${VITE_GAME_NAME:-}
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
         VITE_WS_BASE_URL: ${VITE_WS_BASE_URL:-}
     restart: unless-stopped

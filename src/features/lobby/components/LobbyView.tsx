@@ -11,7 +11,6 @@ import {
   getUserTeams,
 } from '../api/lobby-api'
 import { ChatChannelPanel, ConnectionsPanel } from './SocialPanel'
-import { LiveActivityPanel } from './LobbySidebar'
 import { TeamsPanel, type RunAction } from './TeamsPanel'
 import { useLobbyRealtime } from '../hooks/use-lobby-realtime'
 import { AuthPanel } from '@/features/players/components/AuthPanel'
@@ -87,7 +86,7 @@ export function LobbyView({ user, loginWithQQ, onlineUserIds }: LobbyViewProps) 
 
   const showInviteCopied = useCallback(() => {
     showFeedback(
-      t('team_react.inviteCopied', undefined, '\u590d\u5236\u6210\u529f\uff0c\u8bf7\u5728\u6e38\u620f\u5185\u7c98\u8d34\u6307\u4ee4\u5373\u53ef\u9080\u8bf7'),
+      t('team_react.inviteCopied', undefined, '\u5df2\u590d\u5236\u73a9\u5bb6\u540d'),
       'success',
       { duration: 1000, placement: 'top' },
     )
@@ -359,7 +358,7 @@ export function LobbyView({ user, loginWithQQ, onlineUserIds }: LobbyViewProps) 
           runAction={runAction}
           onLeaderboardDataMissing={showBindingLeaderboardDataMissing}
         />
-        <LiveActivityPanel compact />
+
       </aside>
 
       <section className="main-stack">

@@ -5,35 +5,7 @@ const { PostgresMigrationRunner } = require('./migration-runner');
 const DATABASE_INIT_RETRY_ATTEMPTS = Number(process.env.DATABASE_INIT_RETRY_ATTEMPTS || 10);
 const DATABASE_INIT_RETRY_DELAY_MS = Number(process.env.DATABASE_INIT_RETRY_DELAY_MS || 1000);
 
-const DEFAULT_TEAM_TYPES = [
-    { id: 'mijing', name: 'Secret Realm' },
-    { id: 'anyingta', name: 'Shadow Tower' },
-    { id: 'levi', name: 'Leviathan' },
-    { id: 'wakuang', name: 'Mining Team' },
-    { id: 'chuanche', name: 'Ship Team' },
-    { id: 'duanzao', name: 'Forging Team' },
-    { id: 'mojin', name: 'Treasure Team' },
-    { id: 'hexin', name: 'Core Team' }
-];
-
-const DEFAULT_I18N = [
-    { team_type_id: 'mijing', language: 'zh', name: '秘境' },
-    { team_type_id: 'anyingta', language: 'zh', name: '暗影塔' },
-    { team_type_id: 'levi', language: 'zh', name: '利维坦' },
-    { team_type_id: 'wakuang', language: 'zh', name: '挖矿队' },
-    { team_type_id: 'chuanche', language: 'zh', name: '船队' },
-    { team_type_id: 'duanzao', language: 'zh', name: '锻造队' },
-    { team_type_id: 'mojin', language: 'zh', name: '摸金队' },
-    { team_type_id: 'hexin', language: 'zh', name: '核心队' },
-    { team_type_id: 'mijing', language: 'en', name: 'Secret Realm' },
-    { team_type_id: 'anyingta', language: 'en', name: 'Shadow Tower' },
-    { team_type_id: 'levi', language: 'en', name: 'Leviathan' },
-    { team_type_id: 'wakuang', language: 'en', name: 'Mining Team' },
-    { team_type_id: 'chuanche', language: 'en', name: 'Ship Team' },
-    { team_type_id: 'duanzao', language: 'en', name: 'Forging Team' },
-    { team_type_id: 'mojin', language: 'en', name: 'Treasure Team' },
-    { team_type_id: 'hexin', language: 'en', name: 'Core Team' }
-];
+const { configuredTeamTypes } = require('../../../platform/game-config');
 
 class Database {
     constructor() {
@@ -108,10 +80,10 @@ class Database {
     }
 
     async insertDefaultTeamTypes() {
-        for (const team of DEFAULT_TEAM_TYPES) {
+        for (const team of configuredTeamTypes()) {
             await this.db.raw(
                 'INSERT INTO team_types (id, name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
-                [team.id, team.name]
+                [team.id, team.en]
             );
         }
     }
@@ -136,12 +108,11 @@ class Database {
     }
 
     async insertDefaultI18nData() {
-        for (const item of DEFAULT_I18N) {
+        for (const item of configuredTeamTypes().flatMap(team => [{ team_type_id: team.id, language: 'zh', name: team.zh }, { team_type_id: team.id, language: 'en', name: team.en }])) {
             await this.db.raw(
                 `INSERT INTO team_types_i18n (team_type_id, language, name)
                  VALUES ($1, $2, $3)
-                 ON CONFLICT (team_type_id, language) DO UPDATE SET
-                    name = EXCLUDED.name`,
+                 ON CONFLICT (team_type_id, language) DO UPDATE SET name = EXCLUDED.name`,
                 [item.team_type_id, item.language, item.name]
             );
         }
@@ -160,16 +131,6 @@ class Database {
 
     async insertDefaultAppSettings() {
         const settings = [
-            {
-                key: 'trovepal_api_key',
-                value: process.env.TROVEPAL_API_KEY || '',
-                secret: true
-            },
-            {
-                key: 'trovepal_app_name',
-                value: process.env.TROVEPAL_APP_NAME || 'TroveBBS',
-                secret: false
-            },
             {
                 key: 'qq_bot_app_id',
                 value: process.env.QQ_BOT_APP_ID || '',
@@ -238,3 +199,4 @@ class Database {
 }
 
 module.exports = Database;
+module.exports.configuredTeamTypes = configuredTeamTypes;

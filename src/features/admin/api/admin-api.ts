@@ -8,13 +8,11 @@ import type {
   AdminQqBotConfig,
   AdminQqBotContentConfig,
   AdminQqOauthConfig,
-  AdminTrovePalConfig,
   AdminSummary,
   AdminUser,
   AdminMarketListingPage,
   ChatMessage,
   Team,
-  TrovePalAnnouncementInitialization,
   User,
   MarketListing,
   DishonestyReport,
@@ -37,7 +35,6 @@ export interface AdminDashboardSnapshot {
   qqBotContentConfig: AdminQqBotContentConfig
   qqOauthConfig: AdminQqOauthConfig
   imageHostConfig: AdminImageHostConfig
-  trovePalConfig: AdminTrovePalConfig
 }
 
 export function loginAdmin(identifier: string, password: string) {
@@ -45,7 +42,7 @@ export function loginAdmin(identifier: string, password: string) {
 }
 
 export async function getAdminDashboard(token: string): Promise<AdminDashboardSnapshot> {
-  const [summary, users, teams, messages, applications, tables, qqBotConfig, qqBotContentConfig, qqOauthConfig, imageHostConfig, trovePalConfig] = await Promise.all([
+  const [summary, users, teams, messages, applications, tables, qqBotConfig, qqBotContentConfig, qqOauthConfig, imageHostConfig] = await Promise.all([
     get<AdminSummary>('/api/admin/summary', token),
     get<AdminUser[]>('/api/admin/users', token),
     get<Team[]>('/api/admin/teams', token),
@@ -56,9 +53,8 @@ export async function getAdminDashboard(token: string): Promise<AdminDashboardSn
     get<AdminQqBotContentConfig>('/api/admin/qq-bot-content-config', token),
     get<AdminQqOauthConfig>('/api/admin/qq-oauth-config', token),
     get<AdminImageHostConfig>('/api/admin/image-host-config', token),
-    get<AdminTrovePalConfig>('/api/admin/trovepal-config', token),
   ])
-  return { summary, users, teams, messages, applications, tables, qqBotConfig, qqBotContentConfig, qqOauthConfig, imageHostConfig, trovePalConfig }
+  return { summary, users, teams, messages, applications, tables, qqBotConfig, qqBotContentConfig, qqOauthConfig, imageHostConfig }
 }
 
 export function getAdminTable(tableName: string, token: string) {
@@ -83,10 +79,6 @@ export function cleanupAdminDatabase(from: string, to: string, token: string) {
 
 export function updateAdminTeamStatus(teamId: number, status: 'active' | 'ended', token: string) {
   return patch<{ success: boolean; team: Team }>(`/api/admin/teams/${teamId}/status`, { status }, token)
-}
-
-export function initializeTrovePalAnnouncements(token: string) {
-  return post<TrovePalAnnouncementInitialization>('/api/admin/announcements/initialize', {}, token)
 }
 
 export function saveQqOauthConfig(
@@ -122,13 +114,6 @@ export function saveImageHostConfig(
   token: string,
 ) {
   return put<AdminImageHostConfig>('/api/admin/image-host-config', input, token)
-}
-
-export function saveTrovePalConfig(
-  input: { app_name: string; api_key: string; clear_api_key: boolean },
-  token: string,
-) {
-  return put<AdminTrovePalConfig>('/api/admin/trovepal-config', input, token)
 }
 
 export function getAdminMarketListings(query: string, page: number, token: string) {

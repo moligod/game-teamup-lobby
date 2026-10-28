@@ -59,7 +59,7 @@ export function AdminAnnouncementsPage({ token }: { token: string }) {
     </section>
     <section className="panel admin-section">
       <h2>{en ? 'Published announcements' : '已发布公告'}</h2>
-      <p>{en ? 'Showing up to 500 manually published announcements. Imported TrovePal items are not edited here.' : '最多显示 500 条手动公告；TrovePal 导入内容不在此处编辑。'}</p>
+      <p>{en ? 'Showing up to 500 manually published announcements.' : '最多显示 500 条手动公告。'}</p>
       {items.length === 0 && <p>{en ? 'No manual announcements yet.' : '暂无手动公告。'}</p>}
       {items.map(item => <div key={item.id} className="panel" style={{ padding: 12, marginTop: 8 }}>
         <strong>{item.title}</strong><p>{choices.find(c => c.value === item.category)?.[en ? 'en' : 'zh']} · {item.posted_at ? new Date(item.posted_at).toLocaleString(locale === 'en' ? 'en-US' : 'zh-CN') : ''}</p>

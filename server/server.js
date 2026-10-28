@@ -7,8 +7,7 @@ const fs = require('fs');
 const Database = require('./src/infrastructure/persistence/postgres/database');
 const { i18nMiddleware } = require('./i18n');
 const WebSocketManager = require('./websocket');
-const { TrovePalAnnouncementClient } = require('./src/infrastructure/trovepal/trovepal-announcement-client');
-const { TrovePalAnnouncementService } = require('./src/modules/announcements/trovepal-announcement-service');
+const { createAnnouncementService } = require('./src/modules/announcements/announcement-service');
 const { registerAnnouncementRoutes } = require('./src/modules/announcements/announcement-routes');
 const { createManualAnnouncementService } = require('./src/modules/announcements/manual-announcement-service');
 const { QqBotClient } = require('./src/infrastructure/qq-bot/qq-bot-client');
@@ -136,7 +135,7 @@ const qqTeamNotifications = new QqTeamNotificationService({
     lobbyQuery: lobbyService,
     playerProfile: (playerName) => leaderboardService.playerProfile(playerName),
     leaderboardVersion: () => leaderboardService.getVersion(),
-    announcementQuery: (query) => trovePalAnnouncements.getAnnouncements(query),
+    announcementQuery: (query) => announcementService.getAnnouncements(query),
     marketQuery: () => marketService.listPublicListings(),
     publicBaseUrl: process.env.PUBLIC_BASE_URL,
     logger: console
@@ -161,13 +160,7 @@ const imageHostClient = new ImageHostClient({
     getConfig: () => adminRepository.getImageHostConfig()
 });
 const playerService = createPlayerService(playerRepository);
-const trovePalAnnouncements = new TrovePalAnnouncementService({
-    client: new TrovePalAnnouncementClient({
-        getConfig: () => adminRepository.getTrovePalConfig()
-    }),
-    repository: announcementRepository,
-    logger: console
-});
+const announcementService = createAnnouncementService(announcementRepository);
 const manualAnnouncements = createManualAnnouncementService(announcementRepository);
 const adminService = createAdminService({
     repository: adminRepository,
@@ -212,7 +205,7 @@ registerLeaderboardRoutes(app, leaderboardService, {
     collectorJsonParser: createCollectorJsonParser({ limit: LEADERBOARD_COLLECTOR_BODY_LIMIT })
 });
 registerAdminRoutes(app, adminService, requireAdmin);
-registerAnnouncementRoutes(app, trovePalAnnouncements, { manualService: manualAnnouncements, requireAdmin });
+registerAnnouncementRoutes(app, announcementService, { manualService: manualAnnouncements, requireAdmin });
 registerMarketRoutes(app, marketService, { requireAdmin, requireUser, upload: imageUpload });
 registerLobbyRoutes(app, lobbyService, lobbyCommandService, { presence: wsManager, requireUser });
 registerProfileRoutes(app, profileService, { upload: avatarUpload, storage: avatarStorage, requireUser });
@@ -278,11 +271,6 @@ async function startServer() {
     server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`WebSocket server is running on ws://localhost:${PORT}`);
-    if (process.env.TROVEPAL_ENABLED === 'true') {
-        trovePalAnnouncements.start().catch((error) => {
-            console.error('TrovePal announcement service failed to start:', error.message);
-        });
-    }
     qqTeamNotifications.start();
     qqBotGateway.start().catch((error) => {
         console.error('QQ gateway failed to start:', error.message);

@@ -85,7 +85,7 @@ export function SellerOfferCard({ offer, onContact, onViewPlayerProfile, onViewR
   const detailsLabel = t('marketC2C.details', undefined, '详情')
   const isAccount = offer.category === 'accounts'
   const priceWithCurrency = `${offer.price} CNY`
-  const displayPrice = offer.isFlux ? `${priceWithCurrency} /1M` : offer.category === 'items' ? `${priceWithCurrency} / ${itemPriceUnit(offer.priceUnit)}` : priceWithCurrency
+  const displayPrice = offer.isFlux ? `${priceWithCurrency}${offer.priceUnit === 'per_million' ? ' / 1M' : ''}` : offer.category === 'items' ? `${priceWithCurrency} / ${itemPriceUnit(offer.priceUnit)}` : priceWithCurrency
   return (
     <article className={offer.isPinned ? 'seller-offer-card pinned' : 'seller-offer-card'}>
       <div className="seller-offer-seller">
@@ -108,7 +108,7 @@ export function SellerOfferCard({ offer, onContact, onViewPlayerProfile, onViewR
         {hasRating ? <span className="seller-offer-rating-score"><Star fill="currentColor" size={14} /> {t('marketC2C.ratingOutOfFive', { rating: formatRating(offer.averageRating!) }, `${formatRating(offer.averageRating!)} / 5 分`)}</span> : <span>{t('marketC2C.noRating', undefined, '暂无评分')}</span>}
         {onViewReviews ? <button onClick={() => onViewReviews(offer)} type="button">{t('marketC2C.viewReviews', undefined, '查看评价')}</button> : null}
       </div>
-      <div className="seller-offer-price"><strong>{displayPrice}</strong>{offer.category !== 'accounts' ? <small>{offer.isFlux ? t('marketC2C.fluxStock', { stock: offer.stock }, `库存 ${offer.stock} 百万`) : t('marketC2C.remainingStock', { stock: offer.stock }, `剩余库存 ${offer.stock}`)}</small> : null}</div>
+      <div className="seller-offer-price"><strong>{displayPrice}</strong>{offer.category !== 'accounts' ? <small>{offer.isFlux ? t('marketC2C.remainingStock', { stock: offer.stock }, `剩余库存 ${offer.stock}`) : t('marketC2C.remainingStock', { stock: offer.stock }, `剩余库存 ${offer.stock}`)}</small> : null}</div>
       {(isAccount && offer.playerName && onViewPlayerProfile) || (offer.listingId && onContact) ? <div className="seller-offer-actions">{isAccount && offer.playerName && onViewPlayerProfile ? <Button className="seller-offer-profile-action" icon={<Eye size={15} />} onClick={() => onViewPlayerProfile(offer.playerName)} size="sm" variant="secondary">{t('marketC2C.accountDetails', undefined, '账号详情')}</Button> : null}{offer.listingId && onContact ? <Button className="seller-offer-action" icon={<MessageCircle size={16} />} onClick={() => onContact(offer)} size="sm" variant="primary">{t('market.contactSeller')}</Button> : null}</div> : null}
     </article>
   )

@@ -1,9 +1,9 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { Bot, DatabaseZap, ImageUp, KeyRound, Newspaper, RotateCcw, Save } from 'lucide-react'
-import { initializeTrovePalAnnouncements, saveImageHostConfig, saveQqBotConfig, saveQqBotContentConfig, saveQqOauthConfig, saveTrovePalConfig } from '../api/admin-api'
+import { saveImageHostConfig, saveQqBotConfig, saveQqBotContentConfig, saveQqOauthConfig } from '../api/admin-api'
 import { formatDate, getErrorMessage } from '@/lib/format'
 import { useI18n } from '@/lib/i18n-react'
-import type { AdminImageHostConfig, AdminQqBotCardKey, AdminQqBotCommandKey, AdminQqBotConfig, AdminQqBotContentConfig, AdminQqOauthConfig, AdminTrovePalConfig, TrovePalAnnouncementInitialization } from '@/lib/types'
+import type { AdminImageHostConfig, AdminQqBotCardKey, AdminQqBotCommandKey, AdminQqBotConfig, AdminQqBotContentConfig, AdminQqOauthConfig } from '@/lib/types'
 import { Button } from '@/shared/ui/Button'
 import { Badge } from '@/shared/ui/Badge'
 import { Notice } from '@/shared/ui/Notice'
@@ -420,88 +420,6 @@ export function ImageHostConfigPanel({
         <Button disabled={!baseUrl.trim() && !clearApiKey} fullWidth icon={<ImageUp size={16} />} loading={saving} type="submit" variant="primary">{saving ? t('common.processing') : t('admin_react.saveImageHostConfig', {}, '保存图床配置')}</Button>
       </form>
       {saved ? <Notice variant="success">{t('admin_react.imageHostConfigSaved', {}, '图床配置已保存')}</Notice> : null}
-      <div className="settings-status"><span>{t('admin_react.lastUpdated', {}, '最后修改')}: {formatDate(config?.updated_at)}</span></div>
-    </section>
-  )
-}
-
-export function TrovePalConfigPanel({
-  config,
-  token,
-  onSaved,
-  onError,
-}: {
-  config: AdminTrovePalConfig | null
-  token: string | null
-  onSaved: (config: AdminTrovePalConfig) => void
-  onError: (message: string) => void
-}) {
-  const { t } = useI18n()
-  const [appName, setAppName] = useState('TroveBBS')
-  const [apiKey, setApiKey] = useState('')
-  const [clearApiKey, setClearApiKey] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [initializing, setInitializing] = useState(false)
-  const [initialization, setInitialization] = useState<TrovePalAnnouncementInitialization | null>(null)
-
-  useEffect(() => {
-    setAppName(config?.app_name || 'TroveBBS')
-    setApiKey('')
-    setClearApiKey(false)
-    setInitialization(null)
-  }, [config])
-
-  async function submit(event: FormEvent) {
-    event.preventDefault()
-    setSaving(true)
-    setSaved(false)
-    try {
-      const payload = await saveTrovePalConfig({
-        app_name: appName,
-        api_key: apiKey,
-        clear_api_key: clearApiKey,
-      }, token!)
-      onSaved(payload)
-      setApiKey('')
-      setClearApiKey(false)
-      setSaved(true)
-    } catch (err) {
-      onError(getErrorMessage(err))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function initializeAnnouncements() {
-    setInitializing(true)
-    setInitialization(null)
-    try {
-      setInitialization(await initializeTrovePalAnnouncements(token!))
-    } catch (err) {
-      onError(getErrorMessage(err))
-    } finally {
-      setInitializing(false)
-    }
-  }
-
-  return (
-    <section className="panel admin-section trovepal-config-panel">
-      <div className="section-head">
-        <h2><Newspaper size={18} /> {t('admin_react.trovePalConfig', {}, 'TrovePal 公告 API 设置')}</h2>
-        <Badge tone={config?.api_key_configured ? 'success' : 'warning'}>{config?.api_key_configured ? t('admin_react.trovePalConfigured', {}, '已配置') : t('admin_react.trovePalMissing', {}, '未配置')}</Badge>
-      </div>
-      <form className="form-stack" onSubmit={submit}>
-        <label>TROVEPAL_APP_NAME<input onChange={(event) => setAppName(event.target.value)} placeholder="TroveBBS" required value={appName} /></label>
-        <label>TROVEPAL_API_KEY<input disabled={clearApiKey} onChange={(event) => setApiKey(event.target.value)} placeholder={config?.api_key_configured ? t('admin_react.keepTrovePalKey', {}, '留空则保留当前密钥') : t('admin_react.enterTrovePalKey', {}, '输入 TrovePal API 密钥')} type="password" value={apiKey} /></label>
-        <label className="checkbox-row"><input checked={clearApiKey} onChange={(event) => setClearApiKey(event.target.checked)} type="checkbox" />{t('admin_react.clearTrovePalKey', {}, '清空当前 TrovePal API 密钥')}</label>
-        <Button disabled={!appName.trim()} fullWidth icon={<Newspaper size={16} />} loading={saving} type="submit" variant="primary">{saving ? t('common.processing') : t('admin_react.saveTrovePalConfig', {}, '保存 TrovePal 设置')}</Button>
-      </form>
-      <Button disabled={!config?.api_key_configured} fullWidth icon={<DatabaseZap size={16} />} loading={initializing} onClick={() => void initializeAnnouncements()} type="button" variant="secondary">
-        {initializing ? t('common.processing') : t('admin_react.initializeTrovePalAnnouncements', {}, '初始化公告数据')}
-      </Button>
-      {saved ? <Notice variant="success">{t('admin_react.trovePalConfigSaved', {}, 'TrovePal 设置已保存')}</Notice> : null}
-      {initialization ? <Notice variant="success">{t('admin_react.trovePalInitialized', { fetched: initialization.fetched, inserted: initialization.inserted }, `已从 TrovePal 拉取 ${initialization.fetched} 条公告，新增 ${initialization.inserted} 条。`)}</Notice> : null}
       <div className="settings-status"><span>{t('admin_react.lastUpdated', {}, '最后修改')}: {formatDate(config?.updated_at)}</span></div>
     </section>
   )

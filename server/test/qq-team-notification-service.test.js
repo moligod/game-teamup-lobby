@@ -210,7 +210,7 @@ test('QQ latest news and marketplace responses render localized content and mark
     assert.doesNotMatch(sent[0].content, /announcements/);
     assert.match(sent[1].content, /Flux bundle/);
     assert.match(sent[1].content, /Alice/);
-    assert.match(sent[1].content, /原晶 Flux：Flux bundle/);
+    assert.match(sent[1].content, /游戏货币：Flux bundle/);
     assert.match(sent[1].content, /道具：Item/);
     assert.match(sent[1].content, /代肝：Service/);
     assert.match(sent[1].content, /账号：Account/);
@@ -340,63 +340,20 @@ test('QQ team query replies stay scoped to each originating group', async () => 
     assert.ok(sent.every((message) => message.options.keyboard));
 });
 
-test('QQ player info command defaults to mastery and exposes category actions', async () => {
+test('QQ player info displays generic ranking names and values', async () => {
     const sent = [];
     const service = new QqTeamNotificationService({
         appSecret: 'test-secret',
-        playerProfile: async (playerName) => {
-            assert.equal(playerName, 'Alice');
-            return {
-                player: { display_name: 'Alice' },
-                items: [
-                    {
-                        category_id: '4',
-                        leaderboard_name: 'Mastery',
-                        rank: 1,
-                        score: '1200',
-                        mastery_level_text: '250'
-                    },
-                    {
-                        category_id: '6',
-                        leaderboard_name: 'Power',
-                        rank: 9,
-                        score: '99.5'
-                    }
-                ]
-            };
-        },
-        client: {
-            isConfigured: () => true,
-            sendGroupMarkdown: async (groupOpenid, content, options) => sent.push({ groupOpenid, content, options })
-        }
+        playerProfile: async () => ({ player: { display_name: 'Alice' }, items: [
+            { leaderboard_name: 'Points', rank: 1, score: '1200' },
+            { leaderboard_name: 'Wins', rank: 2, score: '25' }
+        ] }),
+        client: { isConfigured: () => true, sendGroupMarkdown: async (_group, content) => sent.push(content) }
     });
-
-    const handled = await service.replyWithPlayerProfile({
-        d: {
-            group_openid: 'group-openid',
-            data: { name: '/\u73a9\u5bb6\u4fe1\u606f', options: [{ value: 'Alice' }] }
-        }
-    });
-
-    assert.equal(handled, true);
-    assert.equal(sent.length, 1);
-    assert.equal(sent[0].groupOpenid, 'group-openid');
-    assert.ok(sent[0].content.includes('Alice'));
-    assert.ok(sent[0].content.includes('Mastery：1,200'));
-    assert.ok(sent[0].content.includes('排名 1'));
-    assert.ok(sent[0].content.includes('1,200'));
-    assert.ok(sent[0].content.includes('250'));
-    assert.doesNotMatch(sent[0].content, /Power/);
-    assert.doesNotMatch(sent[0].content, /排名 9/);
-    assert.doesNotMatch(sent[0].content, /(^|\n)#{1,3}\s/);
-    assert.doesNotMatch(sent[0].content, /\*\*/);
-    assert.deepEqual(
-        sent[0].options.keyboard.content.rows.map((row) => row.buttons.map((button) => button.action.data)),
-        [
-            ['/玩家信息 Alice 周榜', '/玩家信息 Alice 战斗力'],
-            ['/玩家信息 Alice 游戏数据统计']
-        ]
-    );
+    assert.equal(await service.replyWithPlayerProfile({ d: { group_openid: 'group', data: { name: '/玩家信息 Alice' } } }), true);
+    assert.match(sent.join('\n'), /Points/);
+    assert.match(sent.join('\n'), /Wins/);
+    assert.match(sent.join('\n'), /排名 1/);
 });
 
 test('QQ player info appends a noninteractive leaderboard refresh footer', async () => {
@@ -474,149 +431,6 @@ test('QQ mastery profile separates normalized progress from its score', () => {
     assert.match(message, /总专精点数量：228,471\nLv 1009 171\/455 · 排名 27/);
     assert.match(message, /晶洞世界专精点：14,825\nLv 100 5725\/0 · 排名 1/);
     assert.doesNotMatch(message, /\(|\)|171\/455 \+ 5725\/0/);
-});
-
-test('QQ player profile category actions select the requested rankings without lobby buttons', async () => {
-    const sent = [];
-    const requestedPlayers = [];
-    const profile = {
-        player: { display_name: 'Alice' },
-        items: [
-            {
-                category_id: '4',
-                leaderboard_name: 'Mastery',
-                rank: 1,
-                score: '1200'
-            },
-            {
-                category_id: '3',
-                leaderboard_name: 'Weekly',
-                rank: 2,
-                score: '800'
-            },
-            {
-                category_id: '8',
-                leaderboard_name: 'Delve',
-                rank: 3,
-                score: '700'
-            },
-            {
-                category_id: '9',
-                leaderboard_name: 'Activity',
-                rank: 4,
-                score: '600'
-            },
-            {
-                category_id: '10',
-                leaderboard_name: 'Paragon',
-                rank: 5,
-                score: '500'
-            },
-            {
-                category_id: '99',
-                leaderboard_name: 'Other',
-                rank: 6,
-                score: '400'
-            },
-            {
-                category_id: '6',
-                leaderboard_name: 'Power',
-                rank: 7,
-                score: '300'
-            },
-            ...Array.from({ length: 80 }, (_, index) => ({
-                category_id: '5',
-                leaderboard_name: 'Board ' + (index + 1),
-                rank: index + 1,
-                score: String(index + 100)
-            }))
-        ]
-    };
-    const service = new QqTeamNotificationService({
-        appSecret: 'test-secret',
-        playerProfile: async (playerName) => {
-            requestedPlayers.push(playerName);
-            return profile;
-        },
-        client: {
-            isConfigured: () => true,
-            sendGroupMarkdown: async (groupOpenid, content, options) => sent.push({ groupOpenid, content, options })
-        }
-    });
-
-    await service.replyWithPlayerProfile({
-        d: { group_openid: 'group-openid', data: { name: '/\u73a9\u5bb6\u4fe1\u606f Alice' } }
-    });
-
-    assert.equal(sent.length, 1);
-    assert.match(sent[0].content, /【专精点】/);
-    assert.match(sent[0].content, /Mastery/);
-    assert.doesNotMatch(sent[0].content, /Weekly|Power|Board 1/);
-    assert.deepEqual(
-        sent[0].options.keyboard.content.rows.map((row) => row.buttons.map((button) => button.action.data)),
-        [
-            ['/玩家信息 Alice 周榜', '/玩家信息 Alice 战斗力'],
-            ['/玩家信息 Alice 游戏数据统计']
-        ]
-    );
-
-    await service.replyWithPlayerProfile({
-        d: { group_openid: 'group-openid', data: { name: '/玩家信息 Alice 周榜' } }
-    });
-
-    assert.equal(sent.length, 2);
-    assert.match(sent[1].content, /【每周竞赛】/);
-    assert.match(sent[1].content, /【秘境】/);
-    assert.match(sent[1].content, /【职业活跃度】/);
-    assert.match(sent[1].content, /【其他】/);
-    assert.match(sent[1].content, /Weekly|Delve|Activity|Paragon|Other/);
-    assert.doesNotMatch(sent[1].content, /Mastery|Power|Board 1/);
-    assert.deepEqual(
-        sent[1].options.keyboard.content.rows.map((row) => row.buttons.map((button) => button.action.data)),
-        [
-            ['/玩家信息 Alice 周榜', '/玩家信息 Alice 战斗力'],
-            ['/玩家信息 Alice 游戏数据统计']
-        ]
-    );
-
-    await service.replyWithPlayerProfile({
-        d: { group_openid: 'group-openid', data: { name: '/玩家信息 Alice 战斗力' } }
-    });
-
-    assert.equal(sent.length, 3);
-    assert.match(sent[2].content, /【战斗力】/);
-    assert.match(sent[2].content, /Power/);
-    assert.doesNotMatch(sent[2].content, /Mastery|Weekly|Board 1/);
-
-    await service.replyWithPlayerProfile({
-        d: { group_openid: 'group-openid', data: { name: '/玩家信息 Alice 游戏数据统计' } }
-    });
-
-    assert.equal(sent.length, 4);
-    const firstStatsPage = sent[3].content.match(/游戏数据统计 (\d+)\/1/);
-    assert.ok(firstStatsPage);
-    const totalPages = Number(firstStatsPage[1]);
-    assert.ok(totalPages > 1);
-    assert.deepEqual(
-        sent[3].options.keyboard.content.rows[0].buttons.map((button) => button.action.data),
-        ['/玩家信息 Alice 游戏数据统计 第2页']
-    );
-    assert.deepEqual(
-        sent[3].options.keyboard.content.rows.slice(1).map((row) => row.buttons.map((button) => button.action.data)),
-        [
-            ['/玩家信息 Alice 周榜', '/玩家信息 Alice 战斗力'],
-            ['/玩家信息 Alice 游戏数据统计']
-        ]
-    );
-
-    await service.replyWithPlayerProfile({
-        d: { group_openid: 'group-openid', data: { name: '/玩家信息 Alice 游戏数据统计 第' + totalPages + '页' } }
-    });
-
-    assert.equal(sent.length, 5);
-    assert.match(sent[4].content, new RegExp('游戏数据统计 ' + totalPages + '/' + totalPages));
-    assert.match(sent[4].content, /Board 80/);
-    assert.deepEqual(requestedPlayers, ['Alice', 'Alice', 'Alice', 'Alice', 'Alice']);
 });
 
 test('QQ player info command reports players that are not indexed', async () => {

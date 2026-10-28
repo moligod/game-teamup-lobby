@@ -1,6 +1,6 @@
 import { Database, Shield, Trash2, UsersRound } from 'lucide-react'
 import { type FormEvent } from 'react'
-import { ImageHostConfigPanel, QqBotConfigPanel, QqBotContentConfigPanel, QqOauthConfigPanel, TrovePalConfigPanel } from './AdminConfigPanels'
+import { ImageHostConfigPanel, QqBotConfigPanel, QqBotContentConfigPanel, QqOauthConfigPanel } from './AdminConfigPanels'
 import { MarketListingPinPanel } from './MarketListingPinPanel'
 import { DishonestyReportReviewPanel } from './DishonestyReportReviewPanel'
 import { AdminMiniTable, AdminTeamList } from './AdminOperations'
@@ -14,7 +14,6 @@ import type {
   AdminQqBotConfig,
   AdminQqBotContentConfig,
   AdminQqOauthConfig,
-  AdminTrovePalConfig,
   AdminSummary,
   AdminUser,
   ChatMessage,
@@ -86,25 +85,20 @@ export function AdminOperationsPage({ teams, messages, applications, onTeamStatu
 export function AdminSettingsPage({
   qqOauthConfig,
   imageHostConfig,
-  trovePalConfig,
   token,
   onQqOauthSaved,
   onImageHostSaved,
-  onTrovePalSaved,
   onError,
 }: {
   qqOauthConfig: AdminQqOauthConfig | null
   imageHostConfig: AdminImageHostConfig | null
-  trovePalConfig: AdminTrovePalConfig | null
   token: string
   onQqOauthSaved: (config: AdminQqOauthConfig) => void
   onImageHostSaved: (config: AdminImageHostConfig) => void
-  onTrovePalSaved: (config: AdminTrovePalConfig) => void
   onError: (message: string) => void
 }) {
   return (
     <div className="admin-settings-grid admin-page-section">
-      <TrovePalConfigPanel config={trovePalConfig} token={token} onSaved={onTrovePalSaved} onError={onError} />
       <QqOauthConfigPanel config={qqOauthConfig} token={token} onSaved={onQqOauthSaved} onError={onError} />
       <ImageHostConfigPanel config={imageHostConfig} token={token} onSaved={onImageHostSaved} onError={onError} />
     </div>

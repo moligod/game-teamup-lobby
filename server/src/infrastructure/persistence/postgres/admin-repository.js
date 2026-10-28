@@ -399,61 +399,6 @@ class PostgresAdminRepository {
         return this.getImageHostPublicConfig();
     }
 
-    async getTrovePalConfig() {
-        const rows = await this.query(
-            `SELECT setting_key, setting_value, updated_at
-             FROM app_settings
-             WHERE setting_key IN ('trovepal_api_key', 'trovepal_app_name')`
-        );
-        const byKey = new Map(rows.map((row) => [row.setting_key, row]));
-        const apiKey = byKey.get('trovepal_api_key')?.setting_value || '';
-        return {
-            api_key: apiKey,
-            app_name: byKey.get('trovepal_app_name')?.setting_value || 'TroveBBS',
-            api_key_configured: Boolean(String(apiKey).trim()),
-            updated_at: rows.reduce((latest, row) => {
-                const value = row.updated_at ? new Date(row.updated_at).getTime() : 0;
-                return value > latest.value ? { value, updated_at: row.updated_at } : latest;
-            }, { value: 0, updated_at: null }).updated_at
-        };
-    }
-
-    async getTrovePalPublicConfig() {
-        const config = await this.getTrovePalConfig();
-        return {
-            app_name: config.app_name,
-            api_key_configured: config.api_key_configured,
-            updated_at: config.updated_at
-        };
-    }
-
-    async updateTrovePalConfig(config) {
-        const updates = [
-            { key: 'trovepal_app_name', value: config.app_name, secret: false }
-        ];
-
-        if (config.clear_api_key) {
-            updates.push({ key: 'trovepal_api_key', value: '', secret: true });
-        } else if (typeof config.api_key === 'string' && config.api_key.trim()) {
-            updates.push({ key: 'trovepal_api_key', value: config.api_key.trim(), secret: true });
-        }
-
-        await this.withTransaction(async (query) => {
-            for (const item of updates) {
-                await query(
-                    `INSERT INTO app_settings (setting_key, setting_value, is_secret, updated_at)
-                     VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
-                     ON CONFLICT (setting_key) DO UPDATE SET
-                        setting_value = EXCLUDED.setting_value,
-                        is_secret = EXCLUDED.is_secret,
-                        updated_at = CURRENT_TIMESTAMP`,
-                    [item.key, item.value, item.secret]
-                );
-            }
-        });
-
-        return this.getTrovePalPublicConfig();
-    }
 
 }
 

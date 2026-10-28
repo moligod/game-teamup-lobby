@@ -276,7 +276,7 @@ test('personal listing updates reject invalid categories and foreign listings', 
     );
 });
 
-test('item listings require a supported unit and digits-only stock, while accounts require a verified game name', async () => {
+test('item listings validate units and accounts accept unverified game names', async () => {
     let received;
     const { service } = createService({
         createListing: async (input) => {
@@ -308,17 +308,12 @@ test('item listings require a supported unit and digits-only stock, while accoun
     assert.equal(received.stock, '');
     assert.equal(received.player_name, 'AccountHero');
 
-    const missingPlayer = createService({}, {
-        playerProfile: async () => {
-            const error = new Error('player not found');
-            error.statusCode = 404;
-            throw error;
-        }
+    const independent = createService({ createListing: async (input) => input }, {
+        playerProfile: async () => { throw new Error('must not be called'); }
     });
-    await assert.rejects(
-        () => missingPlayer.service.createListing({ category: 'accounts', title: 'Account', price: 99, player_name: 'MissingPlayer' }, 19),
-        /没有查询到该游戏名数据/
-    );
+    const result = await independent.service.createListing({ category: 'accounts', title: 'Account', price: 99, player_name: 'AnyGamePlayer' }, 19);
+    assert.equal(result.player_name, 'AnyGamePlayer');
+
 });
 
 test('market conversations derive buyer identity and notify only both participants', async () => {

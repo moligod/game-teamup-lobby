@@ -153,23 +153,6 @@ function createMarketService({
         return value;
     }
 
-    async function validateAccountPlayerName(input) {
-        if (input.category !== 'accounts') return input;
-        if (typeof playerProfile !== 'function') throw new MarketError('Player profile validation is unavailable', 503);
-
-        try {
-            const profile = await playerProfile(input.player_name);
-            const canonicalName = profile?.player?.display_name;
-            if (!canonicalName) throw new MarketError('没有查询到该游戏名数据，请输入正确的游戏名');
-            return { ...input, player_name: canonicalName };
-        } catch (error) {
-            if (error?.statusCode === 404 || error?.status === 404) {
-                throw new MarketError('没有查询到该游戏名数据，请输入正确的游戏名');
-            }
-            throw error;
-        }
-    }
-
     function notifyConversationUpdate(conversation) {
         if (!broadcaster) return;
         const payload = { type: 'market_conversation_update', conversation_id: conversation.id };
@@ -277,7 +260,7 @@ function createMarketService({
         createListing(body, sellerIdValue) {
             const input = normalizeListingInput(body);
             const sellerId = positiveId(sellerIdValue, 'seller_id');
-            return validateAccountPlayerName(input)
+            return Promise.resolve(input)
                 .then((listing) => repository.createListing({ ...listing, seller_id: sellerId }))
                 .then(invalidatePublicListings);
         },
@@ -286,7 +269,7 @@ function createMarketService({
             const id = positiveId(idValue, 'listing_id');
             const sellerId = positiveId(sellerIdValue, 'seller_id');
             const input = normalizeListingInput(body);
-            return validateAccountPlayerName(input)
+            return Promise.resolve(input)
                 .then((listing) => repository.updateSellerListing(id, sellerId, listing))
                 .then(listingOrNotFound)
                 .then(invalidatePublicListings);

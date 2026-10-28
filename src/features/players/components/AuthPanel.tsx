@@ -112,32 +112,9 @@ export function AuthPanel({
               </Button>
             </form>
           ) : null}
-          {gameBindings.slice(0, 2).map((item) => {
-            const totalMasteryLevel = compactMasteryLevel(item.total_mastery_level_text)
-            return (
-              <div className="binding-summary" key={item.player_name}>
-                <div className="binding-summary-head">
-                  <strong>{item.player_name}</strong>
-                  {item.total_mastery_rank ? <span>#{formatNumber(item.total_mastery_rank)}</span> : null}
-                </div>
-                <div className="binding-stats">
-                  <span>
-                    <small>{t('team_react.totalMastery', {}, '\u603b\u4e13\u7cbe')}</small>
-                    <strong>{formatScore(item.total_mastery_score ?? '-')}</strong>
-                    {totalMasteryLevel ? <em>{totalMasteryLevel}</em> : null}
-                  </span>
-                  <span>
-                    <small>{t('team_react.highestPower', {}, '\u6700\u9ad8\u6218\u6597\u529b')}</small>
-                    <strong>{formatScore(item.combat_power ?? '-')}</strong>
-                    {item.combat_rank ? <em>#{formatNumber(item.combat_rank)}</em> : null}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
+          {binding.playerName && <div className="binding-summary"><strong>{binding.playerName}</strong></div>}
           {binding.playerName ? (
             <div className="binding-actions">
-              <Button variant="secondary" onClick={() => void openPlayerProfile()}>{t('common.viewDetails', undefined, '\u67e5\u770b\u8be6\u60c5')}</Button>
               <Button variant="secondary" onClick={() => {
                 closePlayerProfile()
                 void runAction(() => unbindPlayer(user.id), t('team_react.unboundNotice'))

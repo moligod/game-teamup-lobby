@@ -48,8 +48,6 @@ function createService(repositoryOverrides = {}, serviceOptions = {}) {
         updateQqBotContentConfig: async (value) => value,
         getQqOauthPublicConfig: async () => ({}),
         updateQqOauthConfig: async (value) => value,
-        getTrovePalPublicConfig: async () => ({ app_name: 'TroveBBS', api_key_configured: false }),
-        updateTrovePalConfig: async (value) => value,
         ...repositoryOverrides
     };
     const presence = {
@@ -100,35 +98,6 @@ test('database cleanup validates date order before repository access', async () 
         /开始时间不能晚于结束时间/
     );
     assert.equal(called, false);
-});
-
-test('TrovePal configuration validates the app name and keeps the secret out of the response', async () => {
-    let received = null;
-    const savedConfig = { app_name: 'TroveBBS', api_key_configured: true, updated_at: null };
-    const { service } = createService({
-        updateTrovePalConfig: async (value) => {
-            received = value;
-            return savedConfig;
-        }
-    });
-
-    const result = await service.updateTrovePalConfig({
-        app_name: 'TroveBBS',
-        api_key: 'trovepal_sk_test',
-        clear_api_key: false
-    });
-
-    assert.deepEqual(received, {
-        app_name: 'TroveBBS',
-        api_key: 'trovepal_sk_test',
-        clear_api_key: false
-    });
-    assert.deepEqual(result, savedConfig);
-    assert.equal(Object.hasOwn(result, 'api_key'), false);
-    assert.throws(
-        () => service.updateTrovePalConfig({ app_name: ' ', api_key: '', clear_api_key: false }),
-        /app_name is required/
-    );
 });
 
 test('QQ bot configuration updates the runtime without exposing the AppSecret', async () => {

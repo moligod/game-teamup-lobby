@@ -1,5 +1,5 @@
-import { LeaderboardView } from '../features/leaderboard/components/LeaderboardView'
+import { GenericLeaderboardView } from '../features/leaderboard/components/GenericLeaderboardView'
 
 export default function LeaderboardPage() {
-  return <LeaderboardView />
+  return <GenericLeaderboardView />
 }

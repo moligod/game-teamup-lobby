@@ -26,7 +26,6 @@ import type {
   AdminQqBotConfig,
   AdminQqBotContentConfig,
   AdminQqOauthConfig,
-  AdminTrovePalConfig,
   AdminSummary,
   AdminUser,
   ChatMessage,
@@ -49,7 +48,6 @@ export function AdminView() {
   const [qqBotContentConfig, setQqBotContentConfig] = useState<AdminQqBotContentConfig | null>(null)
   const [qqOauthConfig, setQqOauthConfig] = useState<AdminQqOauthConfig | null>(null)
   const [imageHostConfig, setImageHostConfig] = useState<AdminImageHostConfig | null>(null)
-  const [trovePalConfig, setTrovePalConfig] = useState<AdminTrovePalConfig | null>(null)
   const [activeSection, setActiveSection] = useState<AdminSectionId>('overview')
   const [activeTable, setActiveTable] = useState('users')
   const [tableRows, setTableRows] = useState<AdminDatabaseRows | null>(null)
@@ -77,7 +75,6 @@ export function AdminView() {
     setQqBotContentConfig(null)
     setQqOauthConfig(null)
     setImageHostConfig(null)
-    setTrovePalConfig(null)
     setTableRows(null)
     setCleanupResult(null)
     setError(message)
@@ -105,7 +102,6 @@ export function AdminView() {
       setQqBotContentConfig(dashboard.qqBotContentConfig)
       setQqOauthConfig(dashboard.qqOauthConfig)
       setImageHostConfig(dashboard.imageHostConfig)
-      setTrovePalConfig(dashboard.trovePalConfig)
       const nextTable = dashboard.tables.some((item) => item.name === preferredTable) ? preferredTable : dashboard.tables[0]?.name ?? 'users'
       await loadTable(nextTable)
     } catch (err) {
@@ -218,7 +214,7 @@ export function AdminView() {
       page = <AdminAnnouncementsPage token={token!} />
       break
     case 'settings':
-      page = <AdminSettingsPage imageHostConfig={imageHostConfig} onError={setError} onImageHostSaved={setImageHostConfig} onQqOauthSaved={setQqOauthConfig} onTrovePalSaved={setTrovePalConfig} qqOauthConfig={qqOauthConfig} token={token!} trovePalConfig={trovePalConfig} />
+      page = <AdminSettingsPage imageHostConfig={imageHostConfig} onError={setError} onImageHostSaved={setImageHostConfig} onQqOauthSaved={setQqOauthConfig} qqOauthConfig={qqOauthConfig} token={token!} />
       break
     case 'qq-bot':
       page = <AdminQqBotPage onError={setError} onQqBotContentSaved={setQqBotContentConfig} onQqBotSaved={setQqBotConfig} qqBotConfig={qqBotConfig} qqBotContentConfig={qqBotContentConfig} token={token!} />

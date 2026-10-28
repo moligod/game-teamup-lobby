@@ -62,6 +62,11 @@ class PostgresAnnouncementRepository {
         }, { inserted: 0, updated: 0 });
     }
 
+    async listChannels() {
+        const rows = await this.query('SELECT DISTINCT channel_name FROM trovepal_announcements ORDER BY channel_name');
+        return rows.map(row => row.channel_name);
+    }
+
     listManualAnnouncements() {
         return this.query(`SELECT source_id AS id, title, category, content, posted_at
           FROM trovepal_announcements WHERE source_id LIKE 'manual:%'

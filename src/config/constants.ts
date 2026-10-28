@@ -1,5 +1,7 @@
 // 项目常量配置文件
 
+export const GAME_NAME = String(import.meta.env.VITE_GAME_NAME || "").trim().slice(0, 80)
+
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '')
 const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ''
 const defaultApiBaseUrl = import.meta.env.DEV ? 'http://localhost:3000' : browserOrigin
