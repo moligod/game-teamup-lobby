@@ -32,38 +32,38 @@ const DishonestyPage = lazy(loadDishonestyPage)
 const SEO_PAGES: Record<string, { canonicalPath: string; title: string; description: string }> = {
   '/': {
     canonicalPath: '/',
-    title: 'TroveBBS | 宝藏世界组队、开车与交易社区',
-    description: 'TroveBBS 是宝藏世界玩家社区，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
+    title: 'Game Hub | 宝藏世界组队、聊天与交易大厅',
+    description: 'Game Hub 是宝藏世界玩家大厅，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
   },
   '/lobby': {
     canonicalPath: '/',
-    title: 'TroveBBS | 宝藏世界组队、开车与交易社区',
-    description: 'TroveBBS 是宝藏世界玩家社区，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
+    title: 'Game Hub | 宝藏世界组队、聊天与交易大厅',
+    description: 'Game Hub 是宝藏世界玩家大厅，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。',
   },
   '/leaderboard': {
     canonicalPath: '/leaderboard',
-    title: 'Trove 排行榜 | 宝藏世界玩家数据 | TroveBBS',
+    title: 'Trove 排行榜 | 宝藏世界玩家数据 | Game Hub',
     description: '查看宝藏世界玩家排行榜、职业与战力数据，发现适合一起组队开车的伙伴。',
   },
   '/market': {
     canonicalPath: '/market',
-    title: 'Trove 商品交易 | Flux、原晶、彩币与代练 | TroveBBS',
+    title: 'Trove 商品交易 | Flux、原晶、彩币与代练 | Game Hub',
     description: '浏览宝藏世界商品交易信息，包括 Flux、原晶、彩币、Create、代肝、代练与宝石箱。',
   },
   '/news': {
     canonicalPath: '/news',
-    title: 'Trove 最新公告与资讯 | TroveBBS',
+    title: 'Trove 最新公告与资讯 | Game Hub',
     description: '浏览来自 TrovePal 公告频道的宝藏世界最新公告、更新、活动与 PTS 资讯。',
   },
   '/dishonesty': {
     canonicalPath: '/dishonesty',
-    title: 'Trove 交易黑名单 | 宝藏世界交易查询 | TroveBBS',
+    title: 'Trove 交易黑名单 | 宝藏世界交易查询 | Game Hub',
     description: '查询已审核的宝藏世界交易失信记录，提交可核验的交易证据，帮助社区安全购买商品。',
   },
   '/about': {
     canonicalPath: '/about',
-    title: '关于 TroveBBS | 宝藏世界玩家社区',
-    description: '了解 TroveBBS 如何服务宝藏世界玩家的组队、开车、资讯与商品交易需求。',
+    title: '关于 Game Hub | 宝藏世界玩家大厅',
+    description: '了解 Game Hub 如何服务宝藏世界玩家的组队、开车、资讯与商品交易需求。',
   },
 }
 
@@ -79,8 +79,8 @@ function useRouteSeo(pathname: string) {
     const page = isAdmin
       ? {
           canonicalPath: '/admin',
-          title: 'TroveBBS 管理后台',
-          description: 'TroveBBS 管理后台。',
+          title: 'Game Hub 管理后台',
+          description: 'Game Hub 管理后台。',
         }
       : SEO_PAGES[normalizedPath] ?? SEO_PAGES['/']
     const canonicalUrl = new URL(page.canonicalPath, SITE_ORIGIN).toString()
@@ -184,7 +184,7 @@ function App() {
           <Link to="/" className="brand" aria-label={t('app.homeAria')}>
             <span className="brand-mark"><Compass size={19} strokeWidth={2.2} /></span>
             <span>
-              <strong>TroveBBS</strong>
+              <strong>Game Hub</strong>
               <small>{t('app.brandSubtitle')}</small>
             </span>
           </Link>
@@ -229,9 +229,6 @@ function App() {
           {routes}
         </main>
         <footer className="site-footer">
-          <a className="ICP" href="http://beian.miit.gov.cn/" target="_blank" rel="noreferrer">
-            {'\u82cfICP\u59072023028873\u53f7-1'}
-          </a>
           <a href="https://trovepal.com/" target="_blank" rel="noreferrer">
             {'TrovePal'}
           </a>

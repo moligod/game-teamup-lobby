@@ -1,8 +1,77 @@
-# TroveBBS website
+# Game Hub
 
 [中文](README.md) | [中文](README.md)
 
-Game TeamUp Lobby (formerly TroveBBS) is a game team-finding lobby currently tailored to Trove. React, TypeScript and Vite frontend; Node.js, Express and PostgreSQL backend. Features include a team lobby, leaderboard, marketplace, profiles, social features and administration. Leaderboard collection is supplied by the separately distributed Trove leaderboard collector.
+Game Hub (formerly TroveBBS) is a game team-finding lobby currently tailored to Trove. React, TypeScript and Vite frontend; Node.js, Express and PostgreSQL backend. Features include a team lobby, leaderboard, marketplace, profiles, social features and administration. Leaderboard collection is supplied by the separately distributed Trove leaderboard collector.
+
+[中文](README.md)
+
+## Features
+
+- **Team lobby:** browse and create teams, set requirements, manage applications, and use lobby or team chat.
+- **Friends and messages:** search users, manage requests, exchange direct messages, and see online presence. QQ OAuth must be configured for sign-in.
+- **Leaderboards and profiles:** search rankings and bind a game character. Trove data is supplied by a separate MOD and collector; the website does not collect it automatically.
+- **Marketplace:** browse or publish listings, contact sellers, and read or submit reviews.
+- **Dishonesty reports:** submit evidence and reports for administrator review.
+- **News and QQ bot:** optionally configure TrovePal announcements and QQ bot notifications or queries.
+- **Administration:** manage users, teams, marketplace items, reports and integrations.
+
+The current game-specific data and features target Trove. Supporting other games requires development. The site does not currently provide a forum or post feed.
+
+## Screenshots
+
+These images were captured in an isolated local demo with an empty database. Available data and features depend on your configuration. The interface supports Chinese, English, and light/dark themes.
+
+### Team lobby
+
+Browse teams and chat; sign in to create or join a team.
+
+![Team lobby](docs/screenshots/lobby-en.png)
+
+### Leaderboards
+
+Browse and search rankings; the demo is empty until data is imported.
+
+![Leaderboards](docs/screenshots/leaderboard-en.png)
+
+### Marketplace
+
+Browse categories and sign in to publish or contact a seller.
+
+![Marketplace](docs/screenshots/market-en.png)
+
+### News
+
+Announcements require an administrator to configure and synchronize TrovePal.
+
+![News](docs/screenshots/news-en.png)
+
+### Dishonesty reports
+
+Browse reviewed reports or sign in to submit one.
+
+![Dishonesty reports](docs/screenshots/reports-en.png)
+
+### About
+
+Learn what the project does and what configuration it needs.
+
+![About](docs/screenshots/about-en.png)
+
+### Administration
+
+Administrators sign in at `/admin` to use the dashboard. The demo contains no real user data.
+
+![Admin login](docs/screenshots/admin-login-en.png)
+
+![Admin dashboard](docs/screenshots/admin-dashboard-en.png)
+
+## Typical setup
+
+1. Start the site using Docker below and set a unique administrator account and password.
+2. Sign in at `/admin` and configure your own QQ OAuth. Configure TrovePal, an image host or QQ bot if needed.
+3. Users can then sign in with QQ to create or apply to teams, manage friends, chat and use marketplace features.
+4. For Trove leaderboards, use the separately distributed collector and follow its instructions to enter this site's endpoint and matching token.
 
 ## Run with Docker
 

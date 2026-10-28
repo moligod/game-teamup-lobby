@@ -192,7 +192,7 @@ export function AdminView() {
   if (!isAdmin) {
     return (
       <section className="admin-login-shell">
-        <div className="admin-login-brand"><Shield size={19} /><span><strong>TroveBBS</strong><small>{t('adminConsole.brandSubtitle', undefined, '管理控制台')}</small></span></div>
+        <div className="admin-login-brand"><Shield size={19} /><span><strong>Game Hub</strong><small>{t('adminConsole.brandSubtitle', undefined, '管理控制台')}</small></span></div>
         <div className="admin-login-intro"><h1>{t('admin_react.adminLogin', undefined, '管理员登录')}</h1><p>{t('admin_react.loginPrompt', undefined, '请输入管理员账号进入后台。')}</p></div>
         <form className="panel form-stack admin-login-panel" onSubmit={loginAdmin}>
           {error ? <Notice variant="error">{error}</Notice> : null}
@@ -232,7 +232,7 @@ export function AdminView() {
   return (
     <section className="admin-console">
       <header className="admin-console-header">
-        <div className="admin-console-title"><Shield size={19} /><div><strong>TroveBBS</strong><span>{t('adminConsole.brandSubtitle', undefined, '管理控制台')}</span></div></div>
+        <div className="admin-console-title"><Shield size={19} /><div><strong>Game Hub</strong><span>{t('adminConsole.brandSubtitle', undefined, '管理控制台')}</span></div></div>
         <div className="admin-console-actions"><Button icon={<RefreshCw size={16} />} onClick={() => void loadAdmin(activeTable)} variant="secondary">{t('common.refresh')}</Button><Link className="button secondary admin-back-link" to="/"><ArrowLeft size={16} /> {t('adminConsole.backToSite', undefined, '返回网站')}</Link><Button icon={<LogOut size={16} />} onClick={() => clearAdminState()} variant="secondary">{t('auth.logout')}</Button></div>
       </header>
       <div className="admin-console-body">

@@ -233,7 +233,7 @@ function createDefaultQqBotContentDraft(): Pick<AdminQqBotContentConfig, 'comman
     },
     cards: {
       team_notification: [
-        '## TroveBBS 新组队',
+        '## Game Hub 新组队',
         '**队伍**：{{team_name}}',
         '**类型**：{{team_type}}',
         '**队长**：{{leader_name}}',
@@ -246,7 +246,7 @@ function createDefaultQqBotContentDraft(): Pick<AdminQqBotContentConfig, 'comman
       player_info: '{{title}}\n{{body}}',
       latest_news: '{{title}}\n{{body}}',
       market: '{{title}}\n{{body}}',
-      menu: '## TroveBBS 菜单\n请选择下方功能。',
+      menu: '## Game Hub 菜单\n请选择下方功能。',
     },
   }
 }

@@ -105,7 +105,7 @@ test('QQ menu response exposes the four requested command buttons', async () => 
 
     assert.equal(handled, true);
     assert.equal(sent[0].groupOpenid, 'group-openid');
-    assert.match(sent[0].content, /^## TroveBBS 菜单/);
+    assert.match(sent[0].content, /^## Game Hub 菜单/);
     assert.deepEqual(
         sent[0].options.keyboard.content.rows.flatMap((row) => row.buttons.map((button) => button.action.data)),
         ['/队伍列表', '/玩家信息', '/最新资讯', '/交易市场']
@@ -711,7 +711,7 @@ test('QQ team-created notifications send a Markdown card with a keyboard', async
     assert.equal(count, 1);
     assert.deepEqual(marked, [12]);
     assert.equal(sent[0].groupOpenid, 'group-openid');
-    assert.match(sent[0].content, /^## TroveBBS 新组队/);
+    assert.match(sent[0].content, /^## Game Hub 新组队/);
     assert.equal(sent[0].options.keyboard.content.rows[0].buttons[0].action.data, 'https://example.com/lobby');
     assert.equal(sent[0].options.keyboard.content.rows[0].buttons[2].action.data, '/菜单');
     assert.deepEqual(

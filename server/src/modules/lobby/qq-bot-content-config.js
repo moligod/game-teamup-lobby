@@ -30,7 +30,7 @@ const DEFAULT_QQ_BOT_CONTENT_CONFIG = Object.freeze({
     }),
     cards: Object.freeze({
         team_notification: [
-            '## TroveBBS \u65b0\u7ec4\u961f',
+            '## Game Hub \u65b0\u7ec4\u961f',
             '**\u961f\u4f0d**\uff1a{{team_name}}',
             '**\u7c7b\u578b**\uff1a{{team_type}}',
             '**\u961f\u957f**\uff1a{{leader_name}}',
@@ -43,7 +43,7 @@ const DEFAULT_QQ_BOT_CONTENT_CONFIG = Object.freeze({
         player_info: '{{title}}\n{{body}}',
         latest_news: '{{title}}\n{{body}}',
         market: '{{title}}\n{{body}}',
-        menu: '## TroveBBS \u83dc\u5355\n\u8bf7\u9009\u62e9\u4e0b\u65b9\u529f\u80fd\u3002'
+        menu: '## Game Hub \u83dc\u5355\n\u8bf7\u9009\u62e9\u4e0b\u65b9\u529f\u80fd\u3002'
     })
 });
 

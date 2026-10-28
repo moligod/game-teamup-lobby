@@ -336,7 +336,7 @@ function buildConfiguredPlayerProfileMessages(profile, contentConfig, view) {
 function configuredPlayerInfoUsageMessage(contentConfig) {
     const command = resolveQqBotContentConfig(contentConfig).commands.player_info;
     return renderConfiguredCard('player_info', contentConfig, {
-        title: '## TroveBBS \u73a9\u5bb6\u4fe1\u606f',
+        title: '## Game Hub \u73a9\u5bb6\u4fe1\u606f',
         body: '\u8bf7\u5728\u6307\u4ee4\u540e\u8f93\u5165\u73a9\u5bb6\u540d\uff0c\u4f8b\u5982\uff1a`/' + markdownText(command) + ' moligod`'
     });
 }
@@ -367,7 +367,7 @@ function buildTeamCreatedMessage(team, teamLobbyUrl) {
     const combatPower = Number.isFinite(Number(team.min_combat_power)) ? Number(team.min_combat_power) : 0;
 
     return [
-        '## TroveBBS 新组队',
+        '## Game Hub 新组队',
         `**队伍**：${teamName}`,
         `**类型**：${teamType}`,
         `**队长**：${leader}`,
@@ -629,7 +629,7 @@ function buildActiveTeamListMessages(teams) {
     const activeTeams = Array.isArray(teams) ? teams : [];
     if (!activeTeams.length) {
         return [[
-            '## TroveBBS 在线车队',
+            '## Game Hub 在线车队',
             '当前没有可加入的在线车队。'
         ].join('\n')];
     }
@@ -658,7 +658,7 @@ function buildActiveTeamListMessages(teams) {
     if (chunk) chunks.push(chunk);
 
     return chunks.map((content, index) => [
-        `## TroveBBS 在线车队 ${index + 1}/${chunks.length}`,
+        `## Game Hub 在线车队 ${index + 1}/${chunks.length}`,
         `当前共 **${activeTeams.length}** 支`,
         content
     ].join('\n'));
@@ -770,7 +770,7 @@ function buildPlayerProfileMessages(profile, view = DEFAULT_PLAYER_PROFILE_VIEW)
     const itemCount = groups.reduce((count, [, categoryItems]) => count + categoryItems.length, 0);
     if (!itemCount) {
         return [[
-            'TroveBBS · \u73a9\u5bb6\u4fe1\u606f · ' + viewConfig.label,
+            'Game Hub · \u73a9\u5bb6\u4fe1\u606f · ' + viewConfig.label,
             '\u73a9\u5bb6\uff1a' + playerName,
             '\u6682\u65e0' + viewConfig.label + '\u6570\u636e'
         ].join('\n')];
@@ -778,18 +778,18 @@ function buildPlayerProfileMessages(profile, view = DEFAULT_PLAYER_PROFILE_VIEW)
 
     const chunks = splitLines(playerProfileLines(groups), PLAYER_PROFILE_CHUNK_LENGTH);
     return chunks.map((content, index) => [
-        'TroveBBS · \u73a9\u5bb6\u4fe1\u606f · ' + viewConfig.label + (chunks.length > 1 ? ' ' + chunks.length + '/' + (index + 1) : ''),
+        'Game Hub · \u73a9\u5bb6\u4fe1\u606f · ' + viewConfig.label + (chunks.length > 1 ? ' ' + chunks.length + '/' + (index + 1) : ''),
         '\u73a9\u5bb6\uff1a' + playerName + ' · ' + viewConfig.label + '\uff1a' + itemCount + ' \u9879',
         content
     ].join('\n'));
 }
 
 function playerInfoUsageMessage() {
-    return '## TroveBBS \u73a9\u5bb6\u4fe1\u606f\n\u8bf7\u5728\u6307\u4ee4\u540e\u8f93\u5165\u73a9\u5bb6\u540d\uff0c\u4f8b\u5982\uff1a\`/\u73a9\u5bb6\u4fe1\u606f moligod\`';
+    return '## Game Hub \u73a9\u5bb6\u4fe1\u606f\n\u8bf7\u5728\u6307\u4ee4\u540e\u8f93\u5165\u73a9\u5bb6\u540d\uff0c\u4f8b\u5982\uff1a\`/\u73a9\u5bb6\u4fe1\u606f moligod\`';
 }
 
 function playerInfoNotFoundMessage(playerName) {
-    return '## TroveBBS \u73a9\u5bb6\u4fe1\u606f\n\u6682\u672a\u627e\u5230\u73a9\u5bb6\u300c' + markdownText(playerName, '\u73a9\u5bb6', PLAYER_NAME_MAX_LENGTH) + '\u300d\u7684\u6e38\u620f\u4fe1\u606f';
+    return '## Game Hub \u73a9\u5bb6\u4fe1\u606f\n\u6682\u672a\u627e\u5230\u73a9\u5bb6\u300c' + markdownText(playerName, '\u73a9\u5bb6', PLAYER_NAME_MAX_LENGTH) + '\u300d\u7684\u6e38\u620f\u4fe1\u606f';
 }
 
 function latestNewsMarkdownLink(url) {
@@ -851,7 +851,7 @@ function buildLatestNewsMessage(result, newsUrl) {
     });
 
     return [
-        '## TroveBBS 最新资讯',
+        '## Game Hub 最新资讯',
         latestNewsMarkdownLink(newsUrl),
         '',
         ...(lines.length ? lines : ['暂无已同步的最新资讯。'])
@@ -906,14 +906,14 @@ function buildMarketListingsMessage(result) {
     });
 
     return [
-        '## TroveBBS 交易市场',
+        '## Game Hub 交易市场',
         '',
         ...(lines.length ? lines : ['当前没有在售商品。'])
     ].join('\n');
 }
 
 function menuMessage() {
-    return '## TroveBBS 菜单\n请选择下方功能。';
+    return '## Game Hub 菜单\n请选择下方功能。';
 }
 
 class QqTeamNotificationService {
