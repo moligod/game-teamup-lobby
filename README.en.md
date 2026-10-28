@@ -138,6 +138,8 @@ Administrators can publish, edit and delete manual announcements under `/admin` 
 - Optionally set `GAME_TEAM_TYPES` to a JSON array, for example `GAME_TEAM_TYPES=[{"id":"raid","zh":"副本","en":"Raid"}]`. Each item needs a unique id and Chinese and English labels. Recreate the backend after changes. Configured types are inserted or their translated labels updated. Other existing types and teams remain in the database but are excluded from the new-team selector.
 - Import leaderboard CSV using the tool below. Automatic game data collection still needs a collector for that game. Existing data and tables are retained.
 
+Trove users can also use the separate [Trove leaderboard mod and collector](https://github.com/moligod/trove-leaderboard-collector); the website does not require it.
+
 ## Local accounts and leaderboard CSV import
 
 On the home page, create an account with a username of 3–32 letters, numbers, underscores or hyphens and a password of at least 10 characters. Passwords use salted scrypt hashes. Local and QQ accounts are separate; administrators still sign in at `/admin`. Self-service password recovery and account linking are not implemented, so operators need their own recovery procedure. Login and registration are rate-limited per source IP within each backend process. Public deployments should use HTTPS, a trusted reverse proxy, and additional rate limits appropriate to their traffic.
