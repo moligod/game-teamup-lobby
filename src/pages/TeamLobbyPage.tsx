@@ -6,6 +6,7 @@ export default function TeamLobbyPage() {
   return (
     <LobbyView
       loginWithQQ={app.loginWithQQ}
+      loginLocal={app.loginLocal}
       onlineUserIds={app.onlineUserIds}
       user={app.user}
     />

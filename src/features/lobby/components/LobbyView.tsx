@@ -41,6 +41,7 @@ interface FeedbackMessage {
 export interface LobbyViewProps {
   user: import('@/lib/types').User | null
   loginWithQQ: () => Promise<void>
+  loginLocal: (mode: 'login' | 'register', username: string, password: string) => Promise<void>
   onlineUserIds: string[]
 }
 
@@ -55,7 +56,7 @@ function readApplicationTeamName(data: unknown) {
   return typeof name === 'string' && name.trim() ? name : null
 }
 
-export function LobbyView({ user, loginWithQQ, onlineUserIds }: LobbyViewProps) {
+export function LobbyView({ user, loginWithQQ, loginLocal, onlineUserIds }: LobbyViewProps) {
   const { locale, t } = useI18n()
 
   const [teams, setTeams] = useState<Team[]>([])
@@ -353,6 +354,7 @@ export function LobbyView({ user, loginWithQQ, onlineUserIds }: LobbyViewProps) 
         <AuthPanel
           user={user}
           loginWithQQ={loginWithQQ}
+          loginLocal={loginLocal}
           binding={binding}
           gameBindings={gameBindings}
           runAction={runAction}

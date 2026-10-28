@@ -7,7 +7,7 @@ function registerLegacyAuthRoutes(app) {
         '/api/reset-password',
         '/api/validate-reset-token'
     ], (req, res) => {
-        res.status(410).json({ error: '账号密码注册登录已关闭，请使用 QQ 登录' });
+        res.status(410).json({ error: '旧版账号接口已关闭，请使用新版登录入口' });
     });
 }
 

@@ -41,3 +41,7 @@ server/database.sqlite
 server/*.db
 server/uploads/*
 !server/uploads/.gitkeep
+
+# Python local caches
+__pycache__/
+*.pyc

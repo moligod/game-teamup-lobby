@@ -111,7 +111,7 @@ function App() {
   const location = useLocation()
   useRouteSeo(location.pathname)
   const { locale, setLocale, t, supportedLocales } = useI18n()
-  const { auth, loginWithQQ, logout } = useAuthSession()
+  const { auth, loginWithQQ, loginLocal, logout } = useAuthSession()
   const [onlineUsers, setOnlineUsers] = useState(0)
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([])
 
@@ -146,16 +146,20 @@ function App() {
     [location.hash, location.pathname, location.search, navigate, setLocale],
   )
 
+  const openLogin = useCallback(async () => { navigate('/#login') }, [navigate])
+
   const contextValue = useMemo<AppContextValue>(
     () => ({
       ...auth,
       onlineUsers,
       onlineUserIds,
       loginWithQQ,
+      loginLocal,
+      openLogin,
       logout,
       refreshOnlineUsers,
     }),
-    [auth, loginWithQQ, logout, onlineUserIds, onlineUsers, refreshOnlineUsers],
+    [auth, loginWithQQ, loginLocal, openLogin, logout, onlineUserIds, onlineUsers, refreshOnlineUsers],
   )
 
   const isAdminRoute = location.pathname === '/admin' || location.pathname.startsWith('/admin/')

@@ -42,8 +42,8 @@ function AboutPage() {
         ))}
         <h2>{en ? 'Getting started' : '开始使用'}</h2>
         <p>{en
-          ? 'Browse the lobby first. Sign in to create or join teams and use account features. Site operators must configure QQ login and any optional integrations before they can be used.'
-          : '可以先浏览组队大厅。创建或加入队伍、使用账户功能时需要登录；站点管理员需要先配置 QQ 登录和所需的可选服务。'}</p>
+          ? 'Browse the lobby first. Sign in to create or join teams and use account features. Create a local account; QQ sign-in and other integrations are optional.'
+          : '可以先浏览组队大厅。创建或加入队伍、使用账户功能时需要登录；可注册本地账号，QQ 登录和其他服务由管理员按需配置。'}</p>
         <p><Link to="/">{en ? 'Go to the lobby →' : '前往组队大厅 →'}</Link></p>
       </div>
     </section>

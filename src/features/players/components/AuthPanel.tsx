@@ -13,6 +13,7 @@ import { Button } from '@/shared/ui/Button'
 export function AuthPanel({
   user,
   loginWithQQ,
+  loginLocal,
   binding,
   gameBindings,
   runAction,
@@ -20,12 +21,17 @@ export function AuthPanel({
 }: {
   user: User | null
   loginWithQQ: () => Promise<void>
+  loginLocal: (mode: 'login' | 'register', username: string, password: string) => Promise<void>
   binding: PlayerBinding
   gameBindings: GameBinding[]
   runAction: RunAction
   onLeaderboardDataMissing: () => void
 }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const en = locale === 'en'
   const [playerName, setPlayerName] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,6 +54,7 @@ export function AuthPanel({
       await loginWithQQ()
     } catch (err) {
       setError(getErrorMessage(err))
+      setBusy(false)
     }
   }
 
@@ -131,9 +138,20 @@ export function AuthPanel({
     <section className="panel qq-login-panel" id="login">
       <div className="panel-title">
         <UserCheck size={18} />
-        {t('auth.qqLogin')}
+        {en ? 'Account sign in' : '账号登录'}
       </div>
-      <p className="qq-login-hint">{t('auth.qqLoginHint')}</p>
+      <form className="form-stack" onSubmit={async (event) => {
+        event.preventDefault(); setBusy(true); setError(null)
+        try { await loginLocal(mode, username, password); setPassword('') }
+        catch (err) { setError(getErrorMessage(err)) }
+        finally { setBusy(false) }
+      }}>
+        <label>{en ? 'Username' : '用户名'}<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required minLength={3} maxLength={32} /></label>
+        <label>{en ? 'Password (at least 10 characters)' : '密码（至少 10 个字符）'}<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={10} maxLength={256} /></label>
+        <Button variant="primary" fullWidth type="submit" loading={busy}>{mode === 'login' ? (en ? 'Sign in' : '登录') : (en ? 'Create account' : '注册账号')}</Button>
+        <Button variant="secondary" fullWidth type="button" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null) }}>{mode === 'login' ? (en ? 'Create an account' : '注册新账号') : (en ? 'Already have an account? Sign in' : '已有账号，返回登录')}</Button>
+      </form>
+      <p className="qq-login-hint">{en ? 'QQ sign-in is available if configured by the administrator.' : '管理员配置后也可使用 QQ 登录。'}</p>
       <Button variant="default" className="qq-login-button" fullWidth loading={busy} onClick={startQQLogin} icon={<UserCheck size={18} />}>
         {busy ? t('common.processing') : t('auth.qqLoginButton')}
       </Button>

@@ -873,7 +873,9 @@ function marketPriceLabel(listing) {
 
     const rawUnit = cleanText(listing?.price_unit);
     const unit = MARKET_PRICE_UNIT_LABELS.get(rawUnit.toLowerCase()) || rawUnit;
-    return rawPrice + ' CNY' + (unit ? ' / ' + unit : '');
+    const configured = String(process.env.MARKET_CURRENCY || 'CNY').trim().toUpperCase();
+    const currency = /^[A-Z]{3}$/.test(configured) ? configured : 'CNY';
+    return rawPrice + ' ' + currency + (unit ? ' / ' + unit : '');
 }
 
 function featuredMarketListings(result) {

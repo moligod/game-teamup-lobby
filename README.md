@@ -1,13 +1,13 @@
 # Game Hub
 
-Game Hub 是一个可为单款游戏配置的组队大厅，提供组队大厅、排行榜、交易、玩家资料、社交及管理功能。前端为 React、TypeScript 和 Vite，后端为 Node.js、Express 和 PostgreSQL；排行榜数据由配套采集器提供。
+Game Hub 是一个可为单款游戏配置的组队大厅，提供组队大厅、排行榜、交易、玩家资料、社交及管理功能。前端为 React、TypeScript 和 Vite，后端为 Node.js、Express 和 PostgreSQL；排行榜可通过 CSV 导入或兼容接口的采集器提供。
 
 [English](README.en.md)
 
 ## 功能介绍
 
 - **组队大厅**：浏览队伍、创建队伍、设置条件、处理入队申请，并通过大厅和队伍聊天沟通。
-- **好友与私信**：搜索用户、管理好友请求、发送私信和查看在线状态。登录功能需要先配置 QQ OAuth。
+- **好友与私信**：搜索用户、管理好友请求、发送私信和查看在线状态。支持本地账号登录，也可选配 QQ OAuth。
 - **排行榜与玩家资料**：查询榜单及玩家数据，支持绑定游戏角色。排行榜需要由兼容的采集器或数据接入程序上传；网站本身不会自动采集。
 - **交易市场**：浏览或发布商品、站内联系卖家、查看和提交评价。
 - **失信名单**：提交证据和举报，经管理员审核后展示。
@@ -71,9 +71,9 @@ Game Hub 是一个可为单款游戏配置的组队大厅，提供组队大厅�
 ## 使用流程
 
 1. 按下方 Docker 步骤启动网站，并设置独立的管理员账号和密码。
-2. 打开 `/admin` 登录，在集成设置中配置自己的 QQ OAuth；需要图床或机器人时，再分别配置相应服务。
-3. 普通用户通过 QQ 登录后，可以创建或申请加入队伍、管理好友、聊天和使用交易功能。
-4. 如需排行榜，使用与目标游戏兼容的采集器，按接口要求上传数据。
+2. 打开 `/admin` 登录；按需配置 QQ OAuth、图床或 QQ 机器人，这些集成为可选项。
+3. 普通用户在首页注册账号并登录，即可绑定游戏名称、创建或申请加入队伍、管理好友、聊天和使用交易功能。
+4. 如需排行榜，准备 CSV 并使用下方通用导入工具，或使用与目标游戏兼容的采集器上传。
 
 ## 快速启动（Docker）
 
@@ -100,6 +100,7 @@ Invoke-WebRequest http://127.0.0.1:8080/health -UseBasicParsing
 | `USER_SESSION_SECRET` | 普通用户会话签名密钥，填写独立的长随机字符串。变更后已有会话可能失效。 |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_EMAIL` | 初始化管理员；设置密码才会创建或更新。 |
 | `LEADERBOARD_COLLECTOR_TOKEN` | 排行榜上传密钥，至少 32 个随机字符；在采集器“上传数据”中填入相同值。留空时上传接口关闭。 |
+| `MARKET_CURRENCY` | 交易价格使用的三位大写币种代码，默认 `CNY`，例如 `USD`；修改后重建前端并重启后端。不会自动换算已有价格。 |
 | `PUBLIC_BASE_URL`, `FRONTEND_BASE_URL` | 自己部署的公开地址；上线后替换示例域名。 |
 | `QQ_OAUTH_API_URL`, `QQ_OAUTH_APPID`, `QQ_OAUTH_APPKEY`, `QQ_OAUTH_CALLBACK_URL` | 自己使用的兼容 QQ OAuth 服务地址、应用凭据及回调；回调示例为 `https://你的域名/api/auth/qq/callback`，还需在提供方登记。示例地址仅为占位符。 |
 | `IMAGE_HOST_BASE_URL`, `IMAGE_HOST_API_KEY`, `IMAGE_HOST_REVIEW_FOLDER_ID` | 可选图床地址、密钥和审核目录；也可在管理后台配置。生产 Compose 当前需通过后台配置图床。 |
@@ -140,4 +141,23 @@ API 位于 `/api`，健康检查为 `/health`，WebSocket 为 `/ws`，上传文�
 
 - `VITE_GAME_NAME`：在 `.env` 中填写游戏名称，显示在网站顶部；更改后执行 `docker compose up -d --build frontend` 重新构建前端。留空时显示“队伍大厅”。
 - `GAME_TEAM_TYPES`：可选 JSON 数组，例如 `GAME_TEAM_TYPES=[{"id":"raid","zh":"副本","en":"Raid"}]`。每项包含唯一的英文 ID 和中英文名称。未设置时使用休闲、竞技、合作三种通用类型；重建后端加载配置。配置会新增类型并更新同 ID 的显示名称；其他旧类型和队伍仍保存在数据库，但不在新队伍类型列表中显示。
-- 排行榜保留原有快照上传接口；针对其他游戏的采集器需要另行开发。旧排行榜数据及数据表不会自动删除。
+- 排行榜支持下方 CSV 导入；自动从游戏采集仍需使用或开发对应游戏的采集器。旧数据及数据表不会自动删除。
+
+## 本地账号与排行榜导入
+
+首页的“注册新账号”使用 3–32 位字母、数字、下划线或连字符的用户名，密码至少 10 个字符。普通用户密码使用加盐 scrypt 哈希；本地账号与 QQ 账号各自独立，管理员仍从 `/admin` 登录。当前没有自助密码找回或账号合并，部署者应自行制定账号恢复方式。登录和注册在每个后端进程中按来源 IP 限制次数；公网部署应使用 HTTPS 和可信反向代理，并根据实际流量配置额外限流。
+
+通用 CSV 工具仅负责上传，不能自动从游戏中采集。准备 UTF-8 CSV，参考 [示例](scripts/leaderboard-example.csv)：列名为 `leaderboard_id,leaderboard_name,rank,player_name,score`；每行一个玩家，榜单 ID、名称、正整数排名、玩家名和分数均必填，同一 ID 使用相同名称。运行环境需 Python 3。
+
+1. 在网站 `.env` 中设置至少 32 个随机字符的 `LEADERBOARD_COLLECTOR_TOKEN`，并重新启动后端。
+2. 从可信来源获取目标游戏的完整榜单，按示例整理为 CSV。
+3. 在运行导入工具的终端临时设置网址和相同密钥，然后执行：
+
+```powershell
+$env:GAME_HUB_URL = 'http://127.0.0.1:8080'
+$env:LEADERBOARD_COLLECTOR_TOKEN = '<与网站 .env 中相同的密钥>'
+python scripts/import_leaderboard.py scripts/leaderboard-example.csv
+# 可选：附加 --date 2026-10-28 指定数据日期
+```
+
+远程地址请使用 HTTPS，不要提交 CSV 中的隐私数据或密钥。每次成功发布的是**完整快照**，当前榜单会以该 CSV 中的所有榜单为准；不要只上传一个榜单而误以为其他榜单会自动保留。失败时不会发布不完整快照。

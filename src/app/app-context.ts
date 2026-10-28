@@ -5,6 +5,8 @@ export interface AppContextValue extends AuthState {
   onlineUsers: number
   onlineUserIds: string[]
   loginWithQQ: () => Promise<void>
+  loginLocal: (mode: 'login' | 'register', username: string, password: string) => Promise<void>
+  openLogin: () => Promise<void>
   logout: () => void
   refreshOnlineUsers: () => Promise<void>
 }

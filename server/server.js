@@ -33,6 +33,9 @@ const { QqOauthClient } = require('./src/infrastructure/identity/qq-oauth-client
 const { ExpiringStore } = require('./src/platform/expiring-store');
 const { createQqAuthService } = require('./src/modules/identity/qq-auth-service');
 const { registerQqAuthRoutes } = require('./src/modules/identity/qq-auth-routes');
+const { registerLocalAuthRoutes } = require('./src/modules/identity/local-auth-routes');
+const { createLocalAuthService } = require('./src/modules/identity/local-auth-service');
+const { PostgresLocalAuthRepository } = require('./src/infrastructure/persistence/postgres/local-auth-repository');
 const { createAdminSessionService } = require('./src/modules/identity/admin-session-service');
 const { createRequireAdmin, registerAdminSessionRoutes } = require('./src/modules/identity/admin-session-routes');
 const { createSocialService } = require('./src/modules/social/social-service');
@@ -209,6 +212,7 @@ registerAnnouncementRoutes(app, announcementService, { manualService: manualAnno
 registerMarketRoutes(app, marketService, { requireAdmin, requireUser, upload: imageUpload });
 registerLobbyRoutes(app, lobbyService, lobbyCommandService, { presence: wsManager, requireUser });
 registerProfileRoutes(app, profileService, { upload: avatarUpload, storage: avatarStorage, requireUser });
+registerLocalAuthRoutes(app, createLocalAuthService({ repository: new PostgresLocalAuthRepository(db), sessions: userSessionService }));
 registerLegacyAuthRoutes(app);
 
 // 本地头像上传功能已移除，现在使用聚合图床API

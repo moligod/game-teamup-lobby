@@ -1,3 +1,4 @@
+import { MARKET_CURRENCY } from '@/config/constants'
 import { useRef, useState, type FormEvent } from 'react'
 import { Check, Info, LogIn, Pencil, Plus, Power, X } from 'lucide-react'
 import { marketCategories } from '../data/market-catalog'
@@ -60,7 +61,7 @@ function inputFromListing(listing: MarketListing, isActive = Boolean(listing.is_
 
 function formatListingPrice(listing: MarketListing) {
   const price = String(Number(listing.price))
-  const priceWithCurrency = `${price} CNY`
+  const priceWithCurrency = `${price} ${MARKET_CURRENCY}`
   if (listing.category === 'flux') return `${priceWithCurrency}${listing.price_unit === 'per_million' ? ' / 1M' : ''}`
   return listing.category === 'items' ? `${priceWithCurrency} / ${itemPriceUnit(listing.price_unit)}` : priceWithCurrency
 }

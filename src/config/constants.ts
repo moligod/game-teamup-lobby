@@ -1,5 +1,7 @@
 // 项目常量配置文件
 
+export const MARKET_CURRENCY = /^[A-Z]{3}$/.test(String(import.meta.env.VITE_MARKET_CURRENCY || '')) ? String(import.meta.env.VITE_MARKET_CURRENCY) : 'CNY'
+
 export const GAME_NAME = String(import.meta.env.VITE_GAME_NAME || "").trim().slice(0, 80)
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '')

@@ -1,3 +1,4 @@
+import { MARKET_CURRENCY } from '@/config/constants'
 import { useEffect, useRef, useState } from 'react'
 import { Eye, MessageCircle, Pin, Star } from 'lucide-react'
 import { Badge } from '@/shared/ui/Badge'
@@ -84,7 +85,7 @@ export function SellerOfferCard({ offer, onContact, onViewPlayerProfile, onViewR
   const collapseLabel = t('marketC2C.collapse', undefined, '收起')
   const detailsLabel = t('marketC2C.details', undefined, '详情')
   const isAccount = offer.category === 'accounts'
-  const priceWithCurrency = `${offer.price} CNY`
+  const priceWithCurrency = `${offer.price} ${MARKET_CURRENCY}`
   const displayPrice = offer.isFlux ? `${priceWithCurrency}${offer.priceUnit === 'per_million' ? ' / 1M' : ''}` : offer.category === 'items' ? `${priceWithCurrency} / ${itemPriceUnit(offer.priceUnit)}` : priceWithCurrency
   return (
     <article className={offer.isPinned ? 'seller-offer-card pinned' : 'seller-offer-card'}>

@@ -9,7 +9,7 @@ import {
   USER_SESSION_INVALIDATED_EVENT,
 } from '@/lib/storage'
 import type { User } from '@/lib/types'
-import { exchangeQqLoginTicket, getQqLoginUrl } from '../api/auth-api'
+import { authenticateLocal, exchangeQqLoginTicket, getQqLoginUrl } from '../api/auth-api'
 
 export function useAuthSession() {
   const navigate = useNavigate()
@@ -73,11 +73,17 @@ export function useAuthSession() {
     window.location.href = payload.url
   }, [location.hash, location.pathname, location.search])
 
+  const loginLocal = useCallback(async (mode: 'login' | 'register', username: string, password: string) => {
+    const payload = await authenticateLocal(mode, username, password)
+    storeSession(payload.user, payload.token)
+    setAuth({ user: payload.user, token: payload.token ?? null })
+  }, [])
+
   const logout = useCallback(() => {
     clearSession()
     setAuth({ user: null, token: null })
     navigate('/')
   }, [navigate])
 
-  return { auth, loginWithQQ, logout }
+  return { auth, loginWithQQ, loginLocal, logout }
 }
