@@ -1682,8 +1682,6 @@ main:has(.page-grid) + .site-footer {
 
 .qq-login-panel {
   align-content: start;
-  max-height: min(186px, calc(100dvh - 160px));
-  overflow: auto;
 }
 
 .qq-login-hint {
@@ -2541,7 +2539,6 @@ main:has(.page-grid) + .site-footer {
 
   .side-panel {
     grid-template-rows: auto minmax(0, 1fr);
-    overflow: hidden;
   }
 
   .side-panel .activity-panel {
