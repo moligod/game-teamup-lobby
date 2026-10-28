@@ -1,0 +1,13 @@
+.git
+.env
+node_modules
+server/node_modules
+dist
+docker-data
+docker-certs
+*.log
+npm-debug.log*
+server/database.sqlite
+server/*.db
+server/uploads/*
+!server/uploads/.gitkeep

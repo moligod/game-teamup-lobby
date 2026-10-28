@@ -1,0 +1,2 @@
+ALTER TABLE market_listings
+    ADD COLUMN IF NOT EXISTS player_name VARCHAR(128) NOT NULL DEFAULT '';

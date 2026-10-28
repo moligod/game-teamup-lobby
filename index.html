@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TroveBBS | 宝藏世界组队、开车与交易社区</title>
+    <meta name="description" content="TroveBBS 是宝藏世界玩家社区，提供组队开车、商品交易、Flux 原晶彩币、Create 服务、代肝代练与黑名单查询。">
+    <meta name="keywords" content="trove, 宝藏世界, 组队, 开车, 商品, flux, 原晶, 彩币, create, 代肝, 代练, 黑名单, buy, 购买, 商店, 宝石箱">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TroveBBS">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:title" content="TroveBBS | 宝藏世界组队、开车与交易社区">
+    <meta property="og:description" content="宝藏世界玩家的组队、开车、交易与资讯社区。">
+    <meta property="og:url" content="https://example.com/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="TroveBBS | 宝藏世界组队、开车与交易社区">
+    <meta name="twitter:description" content="宝藏世界玩家的组队、开车、交易与资讯社区。">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "TroveBBS",
+        "url": "https://example.com/",
+        "description": "宝藏世界玩家的组队、开车、商品交易与资讯社区。",
+        "inLanguage": ["zh-CN", "en"],
+        "keywords": "trove, 宝藏世界, 组队, 开车, 商品, flux, 原晶, 彩币, create, 代肝, 代练, 黑名单, buy, 购买, 商店, 宝石箱"
+      }
+    </script>
+    <script>
+      (() => {
+        const saved = localStorage.getItem('trovebbs-theme')
+        const theme = saved === 'dark' || saved === 'light'
+          ? saved
+          : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        document.documentElement.dataset.theme = theme
+        document.documentElement.style.colorScheme = theme
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

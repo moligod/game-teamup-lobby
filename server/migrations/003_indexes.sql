@@ -1,0 +1,11 @@
+CREATE INDEX IF NOT EXISTS idx_teams_status_created ON teams(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_team_members_user ON team_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_timestamp ON messages(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_team_applications_status ON team_applications(status, applied_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_player_profession_combat_lower_name ON player_profession_combat (lower(player_name));
+CREATE INDEX IF NOT EXISTS idx_user_player_bindings_player ON user_player_bindings(player_name);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_rank ON leaderboard_entries(leaderboard_id, rank);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_board_lower_player ON leaderboard_entries (leaderboard_id, lower(player_name));
+CREATE INDEX IF NOT EXISTS idx_leaderboards_updated ON leaderboards(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_discord_announcements_posted ON discord_announcements(posted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_app_settings_updated ON app_settings(updated_at DESC);

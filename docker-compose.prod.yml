@@ -1,0 +1,111 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-game_hall}
+      POSTGRES_USER: ${POSTGRES_USER:-game_hall}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_game_hall_postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-game_hall} -d ${POSTGRES_DB:-game_hall}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      app:
+
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR:-http://mirrors.tuna.tsinghua.edu.cn/debian}
+        DEBIAN_SECURITY_MIRROR: ${DEBIAN_SECURITY_MIRROR:-http://mirrors.tuna.tsinghua.edu.cn/debian-security}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-game_hall}
+      POSTGRES_USER: ${POSTGRES_USER:-game_hall}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_game_hall_postgres}
+      USER_SESSION_SECRET: ${USER_SESSION_SECRET:-change_me_to_a_long_random_user_session_secret}
+      UPLOAD_DIR: /data/uploads
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      TROVEPAL_API_KEY: ${TROVEPAL_API_KEY:-}
+      TROVEPAL_APP_NAME: ${TROVEPAL_APP_NAME:-TroveBBS}
+      TROVEPAL_REQUEST_TIMEOUT_MS: ${TROVEPAL_REQUEST_TIMEOUT_MS:-10000}
+      TROVEPAL_ANNOUNCEMENT_REFRESH_MS: ${TROVEPAL_ANNOUNCEMENT_REFRESH_MS:-900000}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-}
+      QQ_OAUTH_API_URL: ${QQ_OAUTH_API_URL:-}
+      QQ_OAUTH_APPID: ${QQ_OAUTH_APPID:-}
+      QQ_OAUTH_APPKEY: ${QQ_OAUTH_APPKEY:-}
+      QQ_OAUTH_CALLBACK_URL: ${QQ_OAUTH_CALLBACK_URL:-}
+      QQ_OAUTH_FRONTEND_SUCCESS_PATH: ${QQ_OAUTH_FRONTEND_SUCCESS_PATH:-/}
+      IMAGE_HOST_REQUEST_TIMEOUT_MS: ${IMAGE_HOST_REQUEST_TIMEOUT_MS:-10000}
+      IMAGE_HOST_UPLOAD_TIMEOUT_MS: ${IMAGE_HOST_UPLOAD_TIMEOUT_MS:-45000}
+      IMAGE_UPLOAD_MAX_CONCURRENCY: ${IMAGE_UPLOAD_MAX_CONCURRENCY:-2}
+      QQ_BOT_APP_ID: ${QQ_BOT_APP_ID:-}
+      QQ_BOT_APP_SECRET: ${QQ_BOT_APP_SECRET:-}
+      QQ_BOT_TEAM_URL: ${QQ_BOT_TEAM_URL:-}
+      QQ_BOT_NOTIFICATION_POLL_MS: ${QQ_BOT_NOTIFICATION_POLL_MS:-15000}
+      DATABASE_INIT_RETRY_ATTEMPTS: ${DATABASE_INIT_RETRY_ATTEMPTS:-10}
+      DATABASE_INIT_RETRY_DELAY_MS: ${DATABASE_INIT_RETRY_DELAY_MS:-1000}
+      POSTGRES_POOL_MAX: ${POSTGRES_POOL_MAX:-10}
+      POSTGRES_POOL_IDLE_TIMEOUT_MS: ${POSTGRES_POOL_IDLE_TIMEOUT_MS:-30000}
+      POSTGRES_CONNECT_TIMEOUT_MS: ${POSTGRES_CONNECT_TIMEOUT_MS:-5000}
+      POSTGRES_STATEMENT_TIMEOUT_MS: ${POSTGRES_STATEMENT_TIMEOUT_MS:-60000}
+      POSTGRES_LOCK_TIMEOUT_MS: ${POSTGRES_LOCK_TIMEOUT_MS:-10000}
+      POSTGRES_IDLE_IN_TRANSACTION_TIMEOUT_MS: ${POSTGRES_IDLE_IN_TRANSACTION_TIMEOUT_MS:-30000}
+      POSTGRES_APPLICATION_NAME: ${POSTGRES_APPLICATION_NAME:-trovebbs-backend}
+      JSON_BODY_LIMIT: ${JSON_BODY_LIMIT:-256kb}
+      URLENCODED_BODY_LIMIT: ${URLENCODED_BODY_LIMIT:-64kb}
+      LEADERBOARD_COLLECTOR_BODY_LIMIT: ${LEADERBOARD_COLLECTOR_BODY_LIMIT:-32mb}
+      LEADERBOARD_COLLECTOR_TOKEN: ${LEADERBOARD_COLLECTOR_TOKEN:-}
+    volumes:
+      - ./docker-data:/data
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    networks:
+      app:
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+        VITE_WS_BASE_URL: ${VITE_WS_BASE_URL:-}
+    restart: unless-stopped
+    volumes:
+      - ./docker-data/uploads:/data/uploads:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${APP_BIND_IP:-${FRONTEND_BIND:-127.0.0.1}}:${APP_PORT:-${FRONTEND_PORT:-8080}}:80"
+    networks:
+      app:
+
+networks:
+  app:
+
+volumes:
+  postgres-data:

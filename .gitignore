@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
+.env
+
+# Local reference checkout used to inspect Tencent's legacy SDK. Runtime code
+# uses QQ Bot API v2 directly and must not publish this nested Git repository.
+docs/bot-node-sdk-main/
+
+# Docker/runtime data
+docker-data/
+docker-certs/
+server/database.sqlite
+server/*.db
+server/uploads/*
+!server/uploads/.gitkeep
