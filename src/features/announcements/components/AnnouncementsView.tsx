@@ -105,6 +105,7 @@ function AnnouncementCard({ item }: { item: TrovePalAnnouncement }) {
         </div>
         <time dateTime={item.posted_at || undefined}>{item.posted_at ? formatDate(item.posted_at) : ''}</time>
       </div>
+      {item.title && <h2>{item.title}</h2>}
       <div className="news-author">@{item.author_name}</div>
       {content ? <p>{content}</p> : null}
       {imageUrls.length > 0 ? (

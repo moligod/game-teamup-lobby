@@ -1,6 +1,6 @@
-import { Bot, Boxes, Database, LayoutDashboard, Settings2, Store, UsersRound, type LucideIcon } from 'lucide-react'
+import { Bot, Boxes, Database, LayoutDashboard, Settings2, Store, UsersRound, Newspaper, type LucideIcon } from 'lucide-react'
 
-export type AdminSectionId = 'overview' | 'users' | 'operations' | 'settings' | 'qq-bot' | 'market' | 'data'
+export type AdminSectionId = 'overview' | 'announcements' | 'users' | 'operations' | 'settings' | 'qq-bot' | 'market' | 'data'
 
 type Translate = (key: string, params?: Record<string, string | number>, fallback?: string) => string
 
@@ -13,6 +13,7 @@ interface AdminSectionItem {
 
 const sections: AdminSectionItem[] = [
   { id: 'overview', icon: LayoutDashboard, labelKey: 'adminConsole.overview', fallback: '概览' },
+  { id: 'announcements', icon: Newspaper, labelKey: 'adminConsole.announcements', fallback: '公告管理' },
   { id: 'users', icon: UsersRound, labelKey: 'adminConsole.users', fallback: '用户管理' },
   { id: 'operations', icon: Boxes, labelKey: 'adminConsole.operations', fallback: '运营管理' },
   { id: 'settings', icon: Settings2, labelKey: 'adminConsole.settings', fallback: '集成设置' },

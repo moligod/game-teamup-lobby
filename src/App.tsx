@@ -52,8 +52,8 @@ const SEO_PAGES: Record<string, { canonicalPath: string; title: string; descript
   },
   '/news': {
     canonicalPath: '/news',
-    title: 'Trove 最新公告与资讯 | Game Hub',
-    description: '浏览来自 TrovePal 公告频道的宝藏世界最新公告、更新、活动与 PTS 资讯。',
+    title: '最新公告与资讯 | Game Hub',
+    description: '查看游戏公告、更新、活动及测试资讯。',
   },
   '/dishonesty': {
     canonicalPath: '/dishonesty',

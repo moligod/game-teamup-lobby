@@ -1,0 +1,1 @@
+ALTER TABLE trovepal_announcements ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT '';

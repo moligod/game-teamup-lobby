@@ -12,6 +12,7 @@ import {
 } from '../api/admin-api'
 import { clearAdminSession, loadAdminSession, storeAdminSession, type AdminSession } from '../auth/admin-session'
 import { AdminDataPage, AdminMarketPage, AdminOperationsPage, AdminOverviewPage, AdminQqBotPage, AdminSettingsPage, AdminUsersPage } from './AdminPages'
+import { AdminAnnouncementsPage } from './AdminAnnouncementsPage'
 import { AdminSectionNav, type AdminSectionId } from './AdminSectionNav'
 import { getErrorMessage } from '@/lib/format'
 import { ApiError } from '@/lib/api'
@@ -212,6 +213,9 @@ export function AdminView() {
       break
     case 'operations':
       page = <AdminOperationsPage applications={applications} messages={messages} onTeamStatusChange={updateTeamStatus} t={t} teams={teams} />
+      break
+    case 'announcements':
+      page = <AdminAnnouncementsPage token={token!} />
       break
     case 'settings':
       page = <AdminSettingsPage imageHostConfig={imageHostConfig} onError={setError} onImageHostSaved={setImageHostConfig} onQqOauthSaved={setQqOauthConfig} onTrovePalSaved={setTrovePalConfig} qqOauthConfig={qqOauthConfig} token={token!} trovePalConfig={trovePalConfig} />

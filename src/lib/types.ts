@@ -230,6 +230,7 @@ export type AnnouncementCategory = 'announcement' | 'update' | 'promotion' | 'pt
 
 export interface TrovePalAnnouncement {
   id: string
+  title?: string
   category: AnnouncementCategory
   channel_name: string
   content: string

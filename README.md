@@ -11,7 +11,7 @@ Game Hub（原 TroveBBS）是一个游戏组队大厅，目前以 Trove 为主�
 - **排行榜与玩家资料**：查询榜单及玩家数据，支持绑定游戏角色。Trove 排行榜数据由单独的 MOD 和采集器采集上传；网站本身不会自动采集。
 - **交易市场**：浏览或发布商品、站内联系卖家、查看和提交评价。
 - **失信名单**：提交证据和举报，经管理员审核后展示。
-- **资讯与机器人**：配置 TrovePal 后同步公告；配置 QQ 机器人后可使用组队通知和查询功能。
+- **资讯与机器人**：管理员可在后台手动发布、编辑和删除公告；QQ 机器人为可选集成。
 - **管理后台**：管理用户、队伍、市场、举报及外部服务配置。
 
 当前适配 Trove 的数据和业务；接入其他游戏需要开发适配。站点不提供论坛发帖功能。
@@ -40,7 +40,7 @@ Game Hub（原 TroveBBS）是一个游戏组队大厅，目前以 Trove 为主�
 
 ### 游戏资讯
 
-查看公告；管理员需要先配置 TrovePal 并同步。
+查看管理员发布的公告；可选配置 TrovePal 导入数据。
 
 ![资讯页面](docs/screenshots/news-zh.png)
 
@@ -63,6 +63,10 @@ Game Hub（原 TroveBBS）是一个游戏组队大厅，目前以 Trove 为主�
 ![管理员登录](docs/screenshots/admin-login-zh.png)
 
 ![管理后台](docs/screenshots/admin-dashboard-zh.png)
+
+公告管理支持手动发布、编辑和删除：
+
+![公告管理](docs/screenshots/admin-announcements-zh.png)
 
 ## 使用流程
 
@@ -130,3 +134,5 @@ API 位于 `/api`，健康检查为 `/health`，WebSocket 为 `/ws`，上传文�
 如 QQ 机器人平台要求在站点提供应用归属验证文件，按平台要求将自己的 `<应用ID>.json` 放入 `public/`；不要使用其他站点的应用 ID。
 
 [English documentation](README.en.md)
+
+管理员登录 `/admin` 后选择“公告管理”，可发布、编辑和删除手动公告。TrovePal 自动同步默认关闭；需要时在 `.env` 设置 `TROVEPAL_ENABLED=true` 并配置密钥和应用名，重新创建后端容器。原有 TrovePal 公告不会被删除。

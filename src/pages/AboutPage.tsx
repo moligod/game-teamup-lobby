@@ -10,14 +10,14 @@ function AboutPage() {
         ['Stay connected', 'Find friends, send private messages, and chat in the lobby or with your team.'],
         ['Explore leaderboards', 'Search player and leaderboard data supplied by a separate Trove collector.'],
         ['Browse the market', 'Publish listings, contact sellers, leave reviews, and report dishonest activity.'],
-        ['Read game news', 'Browse announcements synchronized from TrovePal when configured.'],
+        ['Read game news', 'Read announcements published by the site administrator.'],
       ]
     : [
         ['寻找队伍', '浏览组队大厅、创建队伍、设置加入条件，并管理入队申请。'],
         ['保持联系', '搜索和添加好友、发送私信，也可以在大厅或队伍中聊天。'],
         ['查看排行榜', '搜索玩家与排行榜数据；Trove 数据由独立的采集器提供。'],
         ['浏览交易市场', '发布商品、联系卖家、留下评价，并提交失信举报。'],
-        ['查看游戏资讯', '在配置 TrovePal 后，浏览同步的游戏公告与资讯。'],
+        ['查看游戏资讯', '浏览站点管理员发布的公告与资讯。'],
       ]
 
   return (

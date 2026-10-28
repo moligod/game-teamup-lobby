@@ -13,7 +13,7 @@ Game Hub (formerly TroveBBS) is a game team-finding lobby currently tailored to 
 - **Leaderboards and profiles:** search rankings and bind a game character. Trove data is supplied by a separate MOD and collector; the website does not collect it automatically.
 - **Marketplace:** browse or publish listings, contact sellers, and read or submit reviews.
 - **Dishonesty reports:** submit evidence and reports for administrator review.
-- **News and QQ bot:** optionally configure TrovePal announcements and QQ bot notifications or queries.
+- **News and QQ bot:** administrators publish announcements manually; TrovePal import and QQ bot notifications are optional.
 - **Administration:** manage users, teams, marketplace items, reports and integrations.
 
 The current game-specific data and features target Trove. Supporting other games requires development. The site does not currently provide a forum or post feed.
@@ -42,7 +42,7 @@ Browse categories and sign in to publish or contact a seller.
 
 ### News
 
-Announcements require an administrator to configure and synchronize TrovePal.
+Administrators can publish announcements directly; TrovePal import is optional.
 
 ![News](docs/screenshots/news-en.png)
 
@@ -65,6 +65,10 @@ Administrators sign in at `/admin` to use the dashboard. The demo contains no re
 ![Admin login](docs/screenshots/admin-login-en.png)
 
 ![Admin dashboard](docs/screenshots/admin-dashboard-en.png)
+
+Manage manually published announcements:
+
+![Announcement management](docs/screenshots/admin-announcements-en.png)
 
 ## Typical setup
 
@@ -125,3 +129,5 @@ docker compose -f docker-compose.prod.yml config --quiet
 `npm run dev` starts Vite on port 5173 and the backend on port 3000. The backend requires PostgreSQL and environment variables; direct execution does not automatically load `.env`. Use Docker above or supply environment variables to the process.
 
 Public endpoints are `/api`, `/health`, `/uploads` and WebSocket `/ws`. For a public deployment, configure HTTPS and a reverse proxy that forwards these paths and WebSocket connections. Production Compose binds to local port 8080 by default. Replace `example.com` in `index.html`, `public/robots.txt` and `public/sitemap.xml` with your own domain. See [architecture](ARCHITECTURE.md) and [developer notes](docs/ai/). The original automated deployment workflow is not included in this cleaned copy.
+
+Administrators can publish, edit and delete manual announcements under `/admin` → Announcements. Automatic TrovePal sync is off by default. To enable it, set `TROVEPAL_ENABLED=true`, configure its key and app name in `.env`, and recreate the backend container. Existing TrovePal announcements are retained.

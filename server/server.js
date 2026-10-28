@@ -10,6 +10,7 @@ const WebSocketManager = require('./websocket');
 const { TrovePalAnnouncementClient } = require('./src/infrastructure/trovepal/trovepal-announcement-client');
 const { TrovePalAnnouncementService } = require('./src/modules/announcements/trovepal-announcement-service');
 const { registerAnnouncementRoutes } = require('./src/modules/announcements/announcement-routes');
+const { createManualAnnouncementService } = require('./src/modules/announcements/manual-announcement-service');
 const { QqBotClient } = require('./src/infrastructure/qq-bot/qq-bot-client');
 const { QqBotGateway } = require('./src/infrastructure/qq-bot/qq-bot-gateway');
 const { PostgresQqBotRepository } = require('./src/infrastructure/persistence/postgres/qq-bot-repository');
@@ -167,6 +168,7 @@ const trovePalAnnouncements = new TrovePalAnnouncementService({
     repository: announcementRepository,
     logger: console
 });
+const manualAnnouncements = createManualAnnouncementService(announcementRepository);
 const adminService = createAdminService({
     repository: adminRepository,
     presence: wsManager,
@@ -210,7 +212,7 @@ registerLeaderboardRoutes(app, leaderboardService, {
     collectorJsonParser: createCollectorJsonParser({ limit: LEADERBOARD_COLLECTOR_BODY_LIMIT })
 });
 registerAdminRoutes(app, adminService, requireAdmin);
-registerAnnouncementRoutes(app, trovePalAnnouncements, { requireAdmin });
+registerAnnouncementRoutes(app, trovePalAnnouncements, { manualService: manualAnnouncements, requireAdmin });
 registerMarketRoutes(app, marketService, { requireAdmin, requireUser, upload: imageUpload });
 registerLobbyRoutes(app, lobbyService, lobbyCommandService, { presence: wsManager, requireUser });
 registerProfileRoutes(app, profileService, { upload: avatarUpload, storage: avatarStorage, requireUser });
@@ -276,9 +278,11 @@ async function startServer() {
     server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`WebSocket server is running on ws://localhost:${PORT}`);
-    trovePalAnnouncements.start().catch((error) => {
-        console.error('TrovePal announcement service failed to start:', error.message);
-    });
+    if (process.env.TROVEPAL_ENABLED === 'true') {
+        trovePalAnnouncements.start().catch((error) => {
+            console.error('TrovePal announcement service failed to start:', error.message);
+        });
+    }
     qqTeamNotifications.start();
     qqBotGateway.start().catch((error) => {
         console.error('QQ gateway failed to start:', error.message);

@@ -62,6 +62,33 @@ class PostgresAnnouncementRepository {
         }, { inserted: 0, updated: 0 });
     }
 
+    listManualAnnouncements() {
+        return this.query(`SELECT source_id AS id, title, category, content, posted_at
+          FROM trovepal_announcements WHERE source_id LIKE 'manual:%'
+          ORDER BY posted_at DESC NULLS LAST, source_id DESC LIMIT 500`);
+    }
+
+    async createManualAnnouncement(item) {
+        return this.one(`INSERT INTO trovepal_announcements
+          (source_id, title, category, channel_name, content, author_name, posted_at)
+          VALUES ($1, $2, $3, $4, $5, 'Game Hub', CURRENT_TIMESTAMP)
+          RETURNING source_id AS id, title, category, content, posted_at`,
+          [item.id, item.title, item.category, item.channel_name, item.content]);
+    }
+
+    async updateManualAnnouncement(id, item) {
+        return this.one(`UPDATE trovepal_announcements SET title=$2, category=$3, channel_name=$4, content=$5
+          WHERE source_id=$1 AND source_id LIKE 'manual:%'
+          RETURNING source_id AS id, title, category, content, posted_at`,
+          [id, item.title, item.category, item.channel_name, item.content]);
+    }
+
+    async deleteManualAnnouncement(id) {
+        const rows = await this.query(`DELETE FROM trovepal_announcements
+          WHERE source_id=$1 AND source_id LIKE 'manual:%' RETURNING source_id`, [id]);
+        return Array.isArray(rows) && rows.length > 0;
+    }
+
     countAnnouncements(channelName = null) {
         return this.one(`SELECT COUNT(*)::int AS total
           FROM trovepal_announcements
@@ -69,7 +96,7 @@ class PostgresAnnouncementRepository {
     }
 
     listAnnouncements(channelName, limit, offset) {
-        return this.query(`SELECT source_id AS id, category, channel_name, content, author_name,
+        return this.query(`SELECT source_id AS id, title, category, channel_name, content, author_name,
               author_username, image_urls, posted_at, source_url
           FROM trovepal_announcements
           WHERE ${CHANNEL_FILTER_SQL}

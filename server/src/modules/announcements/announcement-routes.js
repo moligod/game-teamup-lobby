@@ -67,6 +67,21 @@ function registerAnnouncementRoutes(app, service, options = {}) {
         }
     });
 
+    if (options.manualService) {
+        const manual = options.manualService;
+        const handle = (fn) => async (req, res) => {
+            try { return res.json({ success: true, data: await fn(req) ?? null }); }
+            catch (error) {
+                if (!error.statusCode || error.statusCode >= 500) logger.error('Manual announcement failed:', error);
+                return res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Announcement request failed' });
+            }
+        };
+        app.get('/api/admin/announcements', requireAdmin, handle(() => manual.list()));
+        app.post('/api/admin/announcements', requireAdmin, handle((req) => manual.create(req.body)));
+        app.put('/api/admin/announcements/:id', requireAdmin, handle((req) => manual.update(req.params.id, req.body)));
+        app.delete('/api/admin/announcements/:id', requireAdmin, handle((req) => manual.remove(req.params.id)));
+    }
+
     app.post('/api/admin/announcements/initialize', requireAdmin, async (_req, res) => {
         try {
             return res.json({ success: true, data: await service.initialize() });
